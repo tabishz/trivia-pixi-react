@@ -7,19 +7,31 @@ class Player {
     this.answers = [];
   }
 
-  incrementScore() {
-    this.score++;
+  /**
+   * Increases the players score by amount of points defined (default: 1)
+   * @param {Int} points increase score by this many points (default: 1)
+   */
+  incrementScore(points = 1) {
+    this.score = this.score + points;
   }
 
   incrementTurns() {
     this.turnsTaken++;
   }
 
-  recordAnswer(question, answer) {
-    this.answers.push({ question, answer });
+  /**
+   * Records the question, answer and the whether the answer was correct
+   * @param {String} question The Question
+   * @param {String} answer The Answer by Player
+   * @param {Boolean} correct Whether answer was marked correct or not
+   */
+  recordAnswer(question, answer, correct) {
+    this.answers.push({ question, answer, correct });
   }
 
-  // You can add other helpful methods here, like resetting score:
+  /**
+   * Resets the all the recorded values for a player.
+   */
   resetScore() {
     this.score = 0;
     this.turnsTaken = 0;

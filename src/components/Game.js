@@ -1,3 +1,4 @@
+import axios from 'axios';
 import Player from './Player';
 
 class Game {
@@ -8,6 +9,7 @@ class Game {
     this.endTime = null;
     this.gameOver = false;
     this.questions = []; // Array to store questions
+    this.attemptedQuestions = []; // Questions that have been played in session
     this.currentQuestion = null; // To hold the currently active question
     this.sessionId = null;
   }
@@ -19,10 +21,15 @@ class Game {
     return this.sessionId;
   }
 
-  addPlayer(name, id) {
+  addPlayer(name) {
+    const id = getNewPlayerId();
     const player = new Player(name, id);
     this.players.push(player);
     return player;
+  }
+
+  getNewPlayerId() {
+    return this.players.length;
   }
 
   removePlayer(id) {
@@ -33,8 +40,9 @@ class Game {
   }
 
   nextTurn() {
+    this.isGameOver();
     if (this.gameOver || this.players.length === 0) {
-      return;
+      return false;
     }
     this.players[this.currentTurn].incrementTurns(); // Increment turns for the current player
     this.currentTurn = (this.currentTurn + 1) % this.players.length; // Move to next player
@@ -43,9 +51,18 @@ class Game {
     return this.players[this.currentTurn];
   }
 
-  // Method to add questions to the game
+  /**
+   * Adds questions and answers to the list of questions
+   * @param {Array} questions Array of Questions and their answers
+   */
   addQuestions(questions) {
     this.questions = [...this.questions, ...questions];
+  }
+
+  async fetchQuestions(numOfQuestions) {
+    const questions = axios.get(`{QUESTIONS_API_URL}?num=${numOfQuestions}`);
+    this.addQuestions(questions);
+    return true;
   }
 
   getNextQuestion() {
@@ -54,9 +71,9 @@ class Game {
       this.gameOver = true;
       return null;
     }
-    // Randomly pick a question index
-    const randomIndex = Math.floor(Math.random() * this.questions.length);
-    const question = this.questions.splice(randomIndex, 1)[0];
+    // Get the last question in the Questions list (list already randomized)
+    const question = this.questions.pop();
+    this.attemptedQuestions.push(question);
     return question;
   }
 
@@ -67,9 +84,11 @@ class Game {
     return this.players[this.currentTurn];
   }
 
-  // TODO: update game over logic
   isGameOver() {
-    return this.gameOver || this.questions.length === 0;
+    if (this.questions.length === 0) {
+      this.gameOver = true;
+    }
+    return this.gameOver;
   }
 
   resetGame() {
@@ -77,6 +96,7 @@ class Game {
     this.currentTurn = 0;
     this.gameOver = false;
     this.questions = [];
+    this.attemptedQuestions = [];
     this.currentQuestion = null;
   }
 
