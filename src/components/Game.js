@@ -14,18 +14,18 @@ class Game {
 
   generateSessionId() {
     const timestamp = this.startTime.toString();
-    const randomString = Math.random().toString(36,).substring(2, 15,);
+    const randomString = Math.random().toString(36).substring(2, 15);
     this.sessionId = timestamp + randomString;
     return this.sessionId;
   }
 
-  addPlayer(name, id,) {
-    const player = new Player(name, id,);
-    this.players.push(player,);
+  addPlayer(name, id) {
+    const player = new Player(name, id);
+    this.players.push(player);
     return player;
   }
 
-  removePlayer(id,) {
+  removePlayer(id) {
     this.players = this.players.filter(player => player.id !== id);
     if (this.currentTurn >= this.players.length) {
       this.currentTurn = 0;
@@ -44,8 +44,8 @@ class Game {
   }
 
   // Method to add questions to the game
-  addQuestions(questions,) {
-    this.questions = [...this.questions, ...questions,];
+  addQuestions(questions) {
+    this.questions = [...this.questions, ...questions];
   }
 
   getNextQuestion() {
@@ -55,8 +55,8 @@ class Game {
       return null;
     }
     // Randomly pick a question index
-    const randomIndex = Math.floor(Math.random() * this.questions.length,);
-    const question = this.questions.splice(randomIndex, 1,)[0];
+    const randomIndex = Math.floor(Math.random() * this.questions.length);
+    const question = this.questions.splice(randomIndex, 1)[0];
     return question;
   }
 

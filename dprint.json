@@ -10,7 +10,7 @@
     "indentWidth": 2,
     "useTabs": false,
     "semiColons": "prefer",
-    "trailingCommas": "always",
+    "trailingCommas": "onlyMultiLine",
     "newLineKind": "lf",
     "quoteProps": "asNeeded",
     "locked": true,
