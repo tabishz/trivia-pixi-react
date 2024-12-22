@@ -1,5 +1,7 @@
 import axios from 'axios';
-import Player from './Player';
+import Player from './Player.js';
+
+const QUESTIONS_API_URL = '';
 
 class Game {
   constructor() {
@@ -11,7 +13,34 @@ class Game {
     this.questions = []; // Array to store questions
     this.attemptedQuestions = []; // Questions that have been played in session
     this.currentQuestion = null; // To hold the currently active question
-    this.sessionId = null;
+    this.sessionId = this.generateSessionId();
+  }
+
+  async start() {
+    // Fetch 100 random questions from the questions bank via API call
+    await this.fetchQuestions(100);
+    const firstPlayer = this.nextTurn();
+    if (firstPlayer) {
+      this.playTurn(firstPlayer);
+    }
+    return false;
+  }
+
+  determineSlotDetails() {}
+  presentQuestion() {}
+
+  async playTurn(player) {
+    await player.playerToRollDice();
+    await player.movePlayerToSlot();
+    await this.determineSlotDetails();
+    await this.presentQuestion();
+    await player.answerQuestion();
+    await player.scoreQuestion();
+    const nextPlayer = this.nextTurn();
+    if (nextPlayer) {
+      await this.playTurn(nextPlayer);
+    }
+    return null;
   }
 
   generateSessionId() {
@@ -21,15 +50,15 @@ class Game {
     return this.sessionId;
   }
 
+  getNewPlayerId() {
+    return this.players.length;
+  }
+
   addPlayer(name) {
-    const id = getNewPlayerId();
+    const id = this.getNewPlayerId();
     const player = new Player(name, id);
     this.players.push(player);
     return player;
-  }
-
-  getNewPlayerId() {
-    return this.players.length;
   }
 
   removePlayer(id) {
@@ -41,14 +70,21 @@ class Game {
 
   nextTurn() {
     this.isGameOver();
-    if (this.gameOver || this.players.length === 0) {
+    if (this.gameOver) {
       return false;
     }
-    this.players[this.currentTurn].incrementTurns(); // Increment turns for the current player
+    const player = this.players[this.currentTurn];
+    player.incrementTurns(); // Increment turns for the current player
+    // If a player gets extra turn, then give this player extra turn
+    if (player.extraTurn === true) {
+      player.endExtraTurn();
+      return player;
+    }
     this.currentTurn = (this.currentTurn + 1) % this.players.length; // Move to next player
     // Get a new question for the next player
     this.currentQuestion = this.getNextQuestion();
-    return this.players[this.currentTurn];
+    const nextPlayer = this.players[this.currentTurn];
+    return nextPlayer;
   }
 
   /**
@@ -60,7 +96,7 @@ class Game {
   }
 
   async fetchQuestions(numOfQuestions) {
-    const questions = axios.get(`{QUESTIONS_API_URL}?num=${numOfQuestions}`);
+    const questions = axios.get(`${QUESTIONS_API_URL}?num=${numOfQuestions}`);
     this.addQuestions(questions);
     return true;
   }
@@ -86,6 +122,13 @@ class Game {
 
   isGameOver() {
     if (this.questions.length === 0) {
+      const message = 'No questions.';
+      console.log(message);
+      this.gameOver = true;
+    }
+    if (this.players.length === 0) {
+      const message = 'No Players.';
+      console.log(message);
       this.gameOver = true;
     }
     return this.gameOver;
