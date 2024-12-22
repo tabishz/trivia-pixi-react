@@ -3,6 +3,7 @@ class Player {
     this.name = name;
     this.id = id; // UID for the player
     this.score = 0;
+    this.extraTurn = false;
     this.turnsTaken = 0;
     this.answers = [];
   }
@@ -13,6 +14,17 @@ class Player {
    */
   incrementScore(points = 1) {
     this.score = this.score + points;
+  }
+
+  /**
+   * Gives this player gets additional turn or not based on the game logic.
+   */
+  giveExtraTurn() {
+    this.extraTurn = true;
+  }
+
+  endExtraTurn() {
+    this.extraTurn = false;
   }
 
   incrementTurns() {
@@ -45,6 +57,15 @@ class Player {
   getTurns() {
     return this.turnsTaken;
   }
+
+  async playerToRollDice() {
+  }
+
+  async movePlayerToSlot() {}
+
+  async answerQuestion() {}
+
+  async scoreQuestion() {}
 }
 
 export default Player;
