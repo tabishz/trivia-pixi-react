@@ -8,13 +8,14 @@ function GameSetupPage({ game }) {
   const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
   const [selectedPlayer, setSelectedPlayer] = useState(null);
   const [showMenu, setShowMenu] = useState(false);
+  const [isEditing, setIsEditing] = useState(false); // State to track if we're editing
   const menuRef = useRef(null); // Use ref to track the menu DOM element
   const navigate = useNavigate();
 
   const addPlayer = () => {
     if (game && playerName) {
       game.addPlayer(playerName, game.getPlayers().length + 1);
-      setPlayerName('');
+      setPlayerName(selectedPlayer.name);
     }
   };
 
@@ -27,7 +28,7 @@ function GameSetupPage({ game }) {
   const handlePlayerOptions = (action) => {
     if (action === 'edit') {
       console.log(`Editing player: ${selectedPlayer.name}`);
-      // Add your edit logic here
+      handleNameChange(selectedPlayer);
     } else if (action === 'delete') {
       console.log(`Deleting player: ${selectedPlayer.name}`);
       game.removePlayer(selectedPlayer.id);
@@ -36,6 +37,18 @@ function GameSetupPage({ game }) {
       // Add your profile logic here
     }
     setShowMenu(false); // Hide the menu after action
+  };
+
+  // Handle the name change
+  const handleNameChange = (player) => {
+    setIsEditing(true);
+    setPlayerName();
+    game.setPlayerName(player.name, player.id);
+  };
+
+  // Save the new player name
+  const saveNewName = () => {
+    setIsEditing(false); // Close the edit pop-up
   };
 
   const editPlayerRightClick = (event, player) => {
@@ -115,6 +128,22 @@ function GameSetupPage({ game }) {
                 View Profile
               </li>
             </ul>
+          </div>
+        )}
+
+        {isEditing && (
+          <div className='edit-popup'>
+            <div className='popup-content'>
+              <h3>Edit Player Name</h3>
+              <input
+                type='text'
+                value={playerName}
+                onChange={handleNameChange}
+                maxLength={16} // Limit the name to 16 characters
+              />
+              <button onClick={saveNewName}>Save</button>
+              <button onClick={() => setIsEditing(false)}>Cancel</button>
+            </div>
           </div>
         )}
       </div>
