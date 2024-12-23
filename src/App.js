@@ -13,7 +13,7 @@ import './App.css';
 
 function App() {
   const [game, setGame] = useState(null); // Lift the game state up to here
-  const [sessionId, setSessionId] = useState(null); // Session ID
+  const [, setSessionId] = useState(null); // Session ID
   const [gameSessions, setGameSessions] = useState([]); // game sessions
 
   return (
@@ -47,22 +47,38 @@ function HomePage({ setGame, setGameSessions, gameSessions, setSessionId }) {
     navigate(`/game/${newGame.sessionId}`); // Redirect to the game page
   };
 
+  const goToGameSession = (gameSessionId) => {
+    const foundGame = gameSessions.find(gameSession => {
+      return gameSession.sessionId === gameSessionId;
+    });
+    if (foundGame?.sessionId) {
+      console.log(`Found game: ${foundGame.sessionId}`);
+      setGame(foundGame);
+      navigate(`/game/${gameSessionId}`);
+    }
+  };
+
   return (
     <div className='App'>
-      <div>
+      <div className='title'>
+        <h1>Return to Him</h1>
+      </div>
+      <div className='main'>
         <ul>
           {gameSessions.map((gameSession) => (
             <li
               key={gameSession.sessionId}
-              onClick={() => navigate(`/game/${gameSession.sessionId}`)}
+              onClick={() => goToGameSession(gameSession.sessionId)}
               className='gameSessionLink'
             >
               {gameSession.sessionId}
             </li>
           ))}
         </ul>
+        <button onClick={startNewGame} className='button-30'>
+          Start a New Game
+        </button>
       </div>
-      <button onClick={startNewGame}>Start a New Game</button>
     </div>
   );
 }
@@ -72,6 +88,7 @@ HomePage.propTypes = {
   setGame: PropTypes.func.isRequired, // 'setGame' is a function
   setGameSessions: PropTypes.func.isRequired, // 'setGameSessions' is a function
   gameSessions: PropTypes.array.isRequired, // 'gameSessions' is an array
+  sessionId: PropTypes.string,
   setSessionId: PropTypes.func.isRequired,
 };
 
