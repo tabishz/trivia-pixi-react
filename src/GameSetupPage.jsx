@@ -14,21 +14,26 @@ function GameSetupPage({ game }) {
 
   const addPlayer = () => {
     if (game && playerName) {
-      game.addPlayer(playerName, game.getPlayers().length + 1);
-      setPlayerName(selectedPlayer.name);
+      game.addPlayer(playerName);
+      setPlayerName('');
     }
   };
 
   const handleKeyDown = (event) => {
     if (event.key === 'Enter') {
-      addPlayer();
+      if (isEditing) {
+        saveNewName();
+      } else {
+        addPlayer();
+      }
     }
   };
 
   const handlePlayerOptions = (action) => {
     if (action === 'edit') {
       console.log(`Editing player: ${selectedPlayer.name}`);
-      handleNameChange(selectedPlayer);
+      setIsEditing(true);
+      setPlayerName(selectedPlayer.name);
     } else if (action === 'delete') {
       console.log(`Deleting player: ${selectedPlayer.name}`);
       game.removePlayer(selectedPlayer.id);
@@ -40,15 +45,15 @@ function GameSetupPage({ game }) {
   };
 
   // Handle the name change
-  const handleNameChange = (player) => {
-    setIsEditing(true);
-    setPlayerName();
-    game.setPlayerName(player.name, player.id);
+  const handleNameChange = (event) => {
+    setPlayerName(event.target.value);
   };
 
   // Save the new player name
   const saveNewName = () => {
+    game.setPlayerName(playerName, selectedPlayer.id);
     setIsEditing(false); // Close the edit pop-up
+    setPlayerName('');
   };
 
   const editPlayerRightClick = (event, player) => {
