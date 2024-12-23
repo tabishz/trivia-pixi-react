@@ -8,7 +8,8 @@ import {
 } from 'react-router-dom';
 
 import Game from './components/Game.js';
-import GamePage from './GamePage.jsx'; //
+import GamePage from './GamePage.jsx';
+import GameSetupPage from './GameSetupPage.jsx';
 import './App.css';
 
 function App() {
@@ -30,7 +31,14 @@ function App() {
             />
           }
         />
-        <Route path='/game/:sessionId' element={<GamePage game={game} />} />
+        <Route
+          path='/game/:sessionId'
+          element={<GameSetupPage game={game} />}
+        />
+        <Route
+          path='/game/:sessionId'
+          element={<GamePage game={game} />}
+        />
       </Routes>
     </Router>
   );
