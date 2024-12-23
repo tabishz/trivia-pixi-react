@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { v7 as uuidv7 } from 'uuid';
 import Player from './Player.js';
 
 const QUESTIONS_API_URL = '';
@@ -51,14 +50,17 @@ class Game {
     return this.sessionId;
   }
 
-  getNewPlayerId() {
-    return uuidv7();
+  setPlayerName(name, id) {
+    const thePlayer = this.findPlayer(id);
+    if (thePlayer) {
+      thePlayer.setName(name);
+    }
+    return;
   }
 
   addPlayer(name) {
     if (this.playExists(name)) { return false; }
-    const id = this.getNewPlayerId();
-    const player = new Player(name, id);
+    const player = new Player(name);
     this.players.push(player);
     return player;
   }
@@ -157,6 +159,13 @@ class Game {
 
   getPlayers() {
     return this.players; // Returns array of player objects
+  }
+
+  findPlayer(id) {
+    const thePlayer = this.players.find(player => {
+      return player.id === id;
+    });
+    return thePlayer;
   }
 
   getSessionId() {

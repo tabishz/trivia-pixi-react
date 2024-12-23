@@ -58,7 +58,69 @@
   transform: translateY(2px);
 }
 
+.input-30 {
+  appearance: none;
+  background-color: #FCFCFD;
+  border-radius: 4px;
+  border-width: 0;
+  box-shadow: rgba(45, 35, 66, 0.4) 0 2px 4px,rgba(45, 35, 66, 0.3) 0 7px 13px -3px,#D6D6E7 0 -3px 0 inset;
+  box-sizing: border-box;
+  color: #36395A;
+  font-family: "Courier New",monospace;
+  height: 48px;
+  padding-left: 16px;
+  padding-right: 16px;
+  text-align: left;
+  font-size: 18px;
+}
+
 .title h1 {
   font-family: Georgia, 'Times New Roman', Times, serif;
   font-size: 4vh;
+}
+
+ul.players {
+  display: flex;
+  justify-content: flex-start;
+  flex-wrap: wrap; /* Wrap items if they overflow */
+  padding: 0;
+  list-style: none;
+  gap: 10px;
+}
+
+li.players {
+  font-family: "Courier New", monospace;
+  font-size: 2em;
+  background-color: #b0def2; /* Background color */
+  border: 2px solid #4ac6f3; /* Border */
+  padding: 10px;
+  margin: 10px; /* Space between items */
+  border-radius: 5px; /* Rounded corners */
+  flex: 0 1 200px; /* Width of each item (adjust as needed) */
+  text-align: center;
+}
+
+/* Pop-up Menu for Players */
+.popup-menu {
+  background-color: white;
+  border: 1px solid gray;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  padding: 10px;
+  position: absolute;
+  z-index: 10;
+}
+
+.popup-menu ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.popup-menu ul li {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.popup-menu ul li:hover {
+  background-color: #f0f0f0;
 }
