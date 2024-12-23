@@ -4,21 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 function GamePage({ game }) {
   const { sessionId } = useParams();
-  const [playerName, setPlayerName] = useState('');
   const navigate = useNavigate();
-
-  const addPlayer = () => {
-    if (game && playerName) {
-      game.addPlayer(playerName, game.getPlayers().length + 1);
-      setPlayerName('');
-    }
-  };
-
-  const handleKeyDown = (event) => {
-    if (event.key === 'Enter') {
-      addPlayer();
-    }
-  };
 
   const goHome = () => {
     navigate('/');
@@ -26,22 +12,8 @@ function GamePage({ game }) {
 
   return (
     <div>
-      <h1>Game Session: {sessionId}</h1>
-      <input
-        type='text'
-        placeholder='Player Name'
-        value={playerName}
-        onChange={e => setPlayerName(e.target.value)}
-        onKeyDown={handleKeyDown}
-      />
-      <button onClick={addPlayer} disabled={!playerName}>Add Player</button>
-      <ul>
-        {game?.getPlayers().map(player => <li key={player.id}>{player.name}
-        </li>)}
-      </ul>
-
       <div className='bottom'>
-        <button onClick={goHome}>Back to Home</button>
+        <button onClick={goHome} className='button-30'>Back to Home</button>
       </div>
     </div>
   );

@@ -1,11 +1,17 @@
+import { v7 as uuidv7 } from 'uuid';
+
 class Player {
-  constructor(name, id) {
-    this.name = name;
-    this.id = id; // UID for the player
+  constructor(name) {
+    this.setName(name);
+    this.id = this._generatePlayerId();
     this.score = 0;
     this.extraTurn = false;
     this.turnsTaken = 0;
     this.answers = [];
+  }
+
+  _generatePlayerId() {
+    return uuidv7();
   }
 
   /**
@@ -14,6 +20,17 @@ class Player {
    */
   incrementScore(points = 1) {
     this.score = this.score + points;
+  }
+
+  getId() {
+    return this.id;
+  }
+
+  setName(name) {
+    if (typeof name !== 'string') { return false; }
+    let newName = name;
+    if (name.length > 16) { newName = name.slice(0, 16); }
+    this.name = newName;
   }
 
   /**
