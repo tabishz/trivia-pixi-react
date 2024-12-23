@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { v7 as uuidv7 } from 'uuid';
 import Player from './Player.js';
 
 const QUESTIONS_API_URL = '';
@@ -51,14 +52,25 @@ class Game {
   }
 
   getNewPlayerId() {
-    return this.players.length;
+    return uuidv7();
   }
 
   addPlayer(name) {
+    if (this.playExists(name)) { return false; }
     const id = this.getNewPlayerId();
     const player = new Player(name, id);
     this.players.push(player);
     return player;
+  }
+
+  playExists(name) {
+    if (this.players.length === 0) { return false; }
+    const foundPlayer = this.players.find(player => player.name === name);
+    if (foundPlayer) {
+      console.log(`${foundPlayer.name} (${foundPlayer.id}) already exists.`);
+      return true;
+    }
+    return false;
   }
 
   removePlayer(id) {
