@@ -3,6 +3,8 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import icons from './components/icons.js';
+import PlayerContextMenu from './components/PlayerContextMenu.jsx';
+import PlayerList from './components/PlayerList.jsx';
 
 function GameSetupPage({ game }) {
   const { sessionId } = useParams();
@@ -88,72 +90,6 @@ function GameSetupPage({ game }) {
 
   const goHome = () => {
     navigate('/');
-  };
-
-  // --- PlayerList Component ---
-  function PlayerList({ players, onPlayerRightClick }) {
-    return (
-      <ul className='players'>
-        {players.map(player => (
-          <li
-            className='players'
-            key={player.id}
-            onContextMenu={(e) => onPlayerRightClick(e, player)}
-          >
-            <img
-              className='players'
-              src={icons[player.icon]}
-              alt={player.name}
-            />
-            {player.name}
-          </li>
-        ))}
-      </ul>
-    );
-  }
-
-  PlayerList.propTypes = {
-    players: PropTypes.array.isRequired,
-    onPlayerRightClick: PropTypes.func.isRequired,
-  };
-
-  // --- PlayerContextMenu Component ---
-  function PlayerContextMenu({
-    showMenu,
-    menuPosition,
-    handlePlayerOptions,
-    menuRef,
-  }) {
-    if (!showMenu) { return null; }
-
-    return (
-      <div
-        ref={menuRef}
-        className='popup-menu'
-        style={{
-          position: 'absolute',
-          top: menuPosition.y,
-          left: menuPosition.x,
-          background: '#fff',
-          border: '1px solid #ccc',
-          padding: '10px',
-          zIndex: 1000,
-        }}
-      >
-        <ul>
-          <li onClick={() => handlePlayerOptions('edit')}>Edit</li>
-          <li onClick={() => handlePlayerOptions('delete')}>Delete</li>
-          <li onClick={() => handlePlayerOptions('icon')}>Select Icon</li>
-        </ul>
-      </div>
-    );
-  }
-
-  PlayerContextMenu.propTypes = {
-    showMenu: PropTypes.bool.isRequired,
-    menuPosition: PropTypes.object.isRequired,
-    handlePlayerOptions: PropTypes.func.isRequired,
-    menuRef: PropTypes.object.isRequired,
   };
 
   // --- EditPlayerPopup Component ---
