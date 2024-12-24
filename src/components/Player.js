@@ -1,7 +1,5 @@
 import { v7 as uuidv7 } from 'uuid';
 
-import icons from './icons.js';
-
 class Player {
   constructor(name) {
     this.setName(name);
@@ -37,7 +35,7 @@ class Player {
   }
 
   setIcon(iconName) {
-    this.icon = icons[iconName];
+    this.icon = iconName;
   }
 
   /**

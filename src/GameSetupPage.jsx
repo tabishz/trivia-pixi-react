@@ -53,7 +53,7 @@ function GameSetupPage({ game }) {
   };
 
   const handleIconSelect = (iconName) => {
-    selectedPlayer.setIcon(iconName);
+    game.setPlayerIcon(iconName, selectedPlayer.id);
     setShowIconMenu(false);
   };
 
@@ -116,7 +116,7 @@ function GameSetupPage({ game }) {
               key={player.id}
               onContextMenu={(e) => editPlayerRightClick(e, player)}
             >
-              <img className='players' src={player.icon} />
+              <img className='players' src={icons[player.icon]} />
               {player.name}
             </li>
           ))}
@@ -163,7 +163,9 @@ function GameSetupPage({ game }) {
           <div className='icon-menu'>
             <h3>Select an Icon</h3>
             <div className='icon-grid'>
-              {Object.keys(icons).map((iconName) => (
+              {Object.keys(icons).filter(icon =>
+                !game?.chosenIcons?.includes(icon)
+              ).map((iconName) => (
                 <img
                   key={iconName}
                   src={icons[iconName]}

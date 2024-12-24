@@ -14,6 +14,7 @@ class Game {
     this.attemptedQuestions = []; // Questions that have been played in session
     this.currentQuestion = null; // To hold the currently active question
     this.sessionId = sessionId || this.generateSessionId();
+    this.chosenIcons = [];
   }
 
   // TODO: create Question class
@@ -60,14 +61,39 @@ class Game {
     return;
   }
 
+  setPlayerIcon(icon, id) {
+    const thePlayer = this.findPlayer(id);
+    if (thePlayer && this.iconAvailable(icon)) {
+      thePlayer.setIcon(icon);
+      this.updateChosenIcons();
+    }
+    return;
+  }
+
+  iconAvailable(iconName) {
+    const foundIcon = this.chosenIcons.find(icon => icon === iconName);
+    if (!foundIcon) {
+      return true;
+    }
+    console.log(`${iconName} already in use.`);
+    return false;
+  }
+
+  updateChosenIcons() {
+    this.chosenIcons = [];
+    this.players.forEach(player => {
+      this.chosenIcons.push(player.icon);
+    });
+  }
+
   addPlayer(name) {
-    if (this.playExists(name)) { return false; }
+    if (this.playerExists(name)) { return false; }
     const player = new Player(name);
     this.players.push(player);
     return player;
   }
 
-  playExists(name) {
+  playerExists(name) {
     if (this.players.length === 0) { return false; }
     const foundPlayer = this.players.find(player => player.name === name);
     if (foundPlayer) {
