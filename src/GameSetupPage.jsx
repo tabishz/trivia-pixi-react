@@ -52,16 +52,16 @@ function GameSetupPage({ game }) {
     setPlayerName(event.target.value);
   };
 
-  const handleIconSelect = (iconName) => {
-    game.setPlayerIcon(iconName, selectedPlayer.id);
-    setShowIconMenu(false);
-  };
-
   // Save the new player name
   const saveNewName = () => {
     game.setPlayerName(playerName, selectedPlayer.id);
     setIsEditing(false); // Close the edit pop-up
     setPlayerName('');
+  };
+
+  const handleIconSelect = (iconName) => {
+    game.setPlayerIcon(iconName, selectedPlayer.id);
+    setShowIconMenu(false);
   };
 
   const editPlayerRightClick = (event, player) => {
@@ -88,6 +88,36 @@ function GameSetupPage({ game }) {
 
   const goHome = () => {
     navigate('/');
+  };
+
+  // --- EditPlayerPopup Component ---
+  function EditPlayerPopup(
+    { isEditing, playerName, handleNameChange, saveNewName },
+  ) {
+    if (!isEditing) { return null; }
+
+    return (
+      <div className='edit-popup'>
+        <div className='popup-content'>
+          <h3>Edit Player Name</h3>
+          <input
+            type='text'
+            value={playerName}
+            onChange={handleNameChange}
+            maxLength={16}
+          />
+          <button onClick={saveNewName}>Save</button>
+          <button onClick={() => setIsEditing(false)}>Cancel</button>
+        </div>
+      </div>
+    );
+  }
+
+  EditPlayerPopup.propTypes = {
+    isEditing: PropTypes.bool.isRequired,
+    playerName: PropTypes.string.isRequired,
+    handleNameChange: PropTypes.func.isRequired,
+    saveNewName: PropTypes.func.isRequired,
   };
 
   return (
@@ -143,21 +173,12 @@ function GameSetupPage({ game }) {
           </div>
         )}
 
-        {isEditing && (
-          <div className='edit-popup'>
-            <div className='popup-content'>
-              <h3>Edit Player Name</h3>
-              <input
-                type='text'
-                value={playerName}
-                onChange={handleNameChange}
-                maxLength={16} // Limit the name to 16 characters
-              />
-              <button onClick={saveNewName}>Save</button>
-              <button onClick={() => setIsEditing(false)}>Cancel</button>
-            </div>
-          </div>
-        )}
+        <EditPlayerPopup
+          isEditing={isEditing}
+          playerName={playerName}
+          handleNameChange={handleNameChange}
+          saveNewName={saveNewName}
+        />
 
         {showIconMenu && (
           <div className='icon-menu'>
