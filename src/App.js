@@ -86,7 +86,7 @@ function HomePage({ setGame, setGameSessions, gameSessions, setSessionId }) {
           </ul>
         </div>
 
-        <button onClick={startNewGame} className='button-74'>
+        <button onClick={startNewGame} className='button-retro'>
           Start a New Game
         </button>
       </div>

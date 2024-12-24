@@ -96,20 +96,20 @@ function GameSetupPage({ game }) {
 
   return (
     <div>
-      <h1>{game.name}</h1>
       <div id='setup'>
+        <h1>{game.name}</h1>
         <input
           type='text'
           placeholder='Player Name'
           value={playerName}
           onChange={e => setPlayerName(e.target.value)}
           onKeyDown={handleKeyDown}
-          className='input-30'
+          className='input-flat-shadow'
         />
         <button
           onClick={addPlayer}
           disabled={!playerName}
-          className='button-30'
+          className='button-retro'
         >
           Add Player
         </button>
@@ -142,10 +142,14 @@ function GameSetupPage({ game }) {
           chosenIcons={game?.chosenIcons || []}
           handleIconSelect={handleIconSelect}
         />
+
+        {game.players.length > 1 && (
+          <button className='button-retro'>Start Game!</button>
+        )}
       </div>
 
       <div className='bottom'>
-        <button onClick={goHome} className='button-30'>Back to Home</button>
+        <button onClick={goHome} className='button-retro'>Back to Home</button>
       </div>
     </div>
   );
