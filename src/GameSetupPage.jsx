@@ -90,6 +90,72 @@ function GameSetupPage({ game }) {
     navigate('/');
   };
 
+  // --- PlayerList Component ---
+  function PlayerList({ players, onPlayerRightClick }) {
+    return (
+      <ul className='players'>
+        {players.map(player => (
+          <li
+            className='players'
+            key={player.id}
+            onContextMenu={(e) => onPlayerRightClick(e, player)}
+          >
+            <img
+              className='players'
+              src={icons[player.icon]}
+              alt={player.name}
+            />
+            {player.name}
+          </li>
+        ))}
+      </ul>
+    );
+  }
+
+  PlayerList.propTypes = {
+    players: PropTypes.array.isRequired,
+    onPlayerRightClick: PropTypes.func.isRequired,
+  };
+
+  // --- PlayerContextMenu Component ---
+  function PlayerContextMenu({
+    showMenu,
+    menuPosition,
+    handlePlayerOptions,
+    menuRef,
+  }) {
+    if (!showMenu) { return null; }
+
+    return (
+      <div
+        ref={menuRef}
+        className='popup-menu'
+        style={{
+          position: 'absolute',
+          top: menuPosition.y,
+          left: menuPosition.x,
+          background: '#fff',
+          border: '1px solid #ccc',
+          padding: '10px',
+          zIndex: 1000,
+        }}
+      >
+        <ul>
+          <li onClick={() => handlePlayerOptions('edit')}>Edit</li>
+          <li onClick={() => handlePlayerOptions('delete')}>Delete</li>
+          <li onClick={() => handlePlayerOptions('icon')}>Select Icon</li>
+        </ul>
+      </div>
+    );
+  }
+
+  PlayerContextMenu.propTypes = {
+    showMenu: PropTypes.bool.isRequired,
+    menuPosition: PropTypes.object.isRequired,
+    handlePlayerOptions: PropTypes.func.isRequired,
+    menuRef: PropTypes.object.isRequired,
+  };
+
   // --- EditPlayerPopup Component ---
   function EditPlayerPopup(
     { isEditing, playerName, handleNameChange, saveNewName },
@@ -120,6 +186,41 @@ function GameSetupPage({ game }) {
     saveNewName: PropTypes.func.isRequired,
   };
 
+  // --- IconSelectionMenu Component ---
+  function IconSelectionMenu(
+    { showIconMenu, icons, chosenIcons, handleIconSelect },
+  ) {
+    if (!showIconMenu) { return null; }
+
+    return (
+      <div className='icon-menu'>
+        <h3>Select an Icon</h3>
+        <div className='icon-grid'>
+          {Object.keys(icons).filter(icon => !chosenIcons.includes(icon)).map((
+            iconName,
+          ) => (
+            <img
+              key={iconName}
+              src={icons[iconName]}
+              alt={iconName}
+              onClick={() => handleIconSelect(iconName)}
+            />
+          ))}
+        </div>
+        <button onClick={() => setShowIconMenu(false)} className='button-30'>
+          Cancel
+        </button>
+      </div>
+    );
+  }
+
+  IconSelectionMenu.propTypes = {
+    showIconMenu: PropTypes.bool.isRequired,
+    icons: PropTypes.object.isRequired,
+    chosenIcons: PropTypes.array.isRequired,
+    handleIconSelect: PropTypes.func.isRequired,
+  };
+
   return (
     <div>
       <h1>{game.name}</h1>
@@ -139,39 +240,18 @@ function GameSetupPage({ game }) {
         >
           Add Player
         </button>
-        <ul className='players'>
-          {game?.getPlayers().map(player => (
-            <li
-              className='players'
-              key={player.id}
-              onContextMenu={(e) => editPlayerRightClick(e, player)}
-            >
-              <img className='players' src={icons[player.icon]} />
-              {player.name}
-            </li>
-          ))}
-        </ul>
-        {showMenu && (
-          <div
-            ref={menuRef} // Attach the ref to the menu element
-            className='popup-menu'
-            style={{
-              position: 'absolute',
-              top: menuPosition.y,
-              left: menuPosition.x,
-              background: '#fff',
-              border: '1px solid #ccc',
-              padding: '10px',
-              zIndex: 1000,
-            }}
-          >
-            <ul>
-              <li onClick={() => handlePlayerOptions('edit')}>Edit</li>
-              <li onClick={() => handlePlayerOptions('delete')}>Delete</li>
-              <li onClick={() => handlePlayerOptions('icon')}>Select Icon</li>
-            </ul>
-          </div>
-        )}
+
+        <PlayerList
+          players={game?.getPlayers()}
+          onPlayerRightClick={editPlayerRightClick}
+        />
+
+        <PlayerContextMenu
+          showMenu={showMenu}
+          menuPosition={menuPosition}
+          handlePlayerOptions={handlePlayerOptions}
+          menuRef={menuRef}
+        />
 
         <EditPlayerPopup
           isEditing={isEditing}
@@ -180,29 +260,12 @@ function GameSetupPage({ game }) {
           saveNewName={saveNewName}
         />
 
-        {showIconMenu && (
-          <div className='icon-menu'>
-            <h3>Select an Icon</h3>
-            <div className='icon-grid'>
-              {Object.keys(icons).filter(icon =>
-                !game?.chosenIcons?.includes(icon)
-              ).map((iconName) => (
-                <img
-                  key={iconName}
-                  src={icons[iconName]}
-                  alt={iconName}
-                  onClick={() => handleIconSelect(iconName)}
-                />
-              ))}
-            </div>
-            <button
-              onClick={() => setShowIconMenu(false)}
-              className='button-30'
-            >
-              Cancel
-            </button>
-          </div>
-        )}
+        <IconSelectionMenu
+          showIconMenu={showIconMenu}
+          icons={icons}
+          chosenIcons={game?.chosenIcons || []}
+          handleIconSelect={handleIconSelect}
+        />
       </div>
 
       <div className='bottom'>
