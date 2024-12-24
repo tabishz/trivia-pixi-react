@@ -80,7 +80,7 @@ function HomePage({ setGame, setGameSessions, gameSessions, setSessionId }) {
                 onClick={() => goToGameSession(gameSession.sessionId)}
                 className='gameSessions'
               >
-                {gameSession.sessionId}
+                {gameSession.name}
               </li>
             ))}
           </ul>

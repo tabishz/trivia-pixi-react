@@ -1,11 +1,12 @@
 import axios from 'axios';
+import createRandomName from './gameNames.js';
 import icons from './icons.js';
 import Player from './Player.js';
 
 const QUESTIONS_API_URL = '';
 
 class Game {
-  constructor(sessionId = null) {
+  constructor(gameName = null, sessionId = null) {
     this.players = [];
     this.currentTurn = 0; // Index of the current player in the players array
     this.startTime = Date.now();
@@ -16,6 +17,7 @@ class Game {
     this.currentQuestion = null; // To hold the currently active question
     this.sessionId = sessionId || this.generateSessionId();
     this.chosenIcons = [];
+    this.name = gameName || createRandomName();
   }
 
   // TODO: create Question class

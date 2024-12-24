@@ -1,0 +1,98 @@
+const colors = [
+  'aqua',
+  'azure',
+  'beige',
+  'black',
+  'blue',
+  'brown',
+  'coral',
+  'cyan',
+  'gold',
+  'gray',
+  'green',
+  'ivory',
+  'khaki',
+  'lime',
+  'linen',
+  'maroon',
+  'navy',
+  'olive',
+  'orange',
+  'peach',
+  'pink',
+  'plum',
+  'purple',
+  'red',
+  'salmon',
+  'silver',
+  'tan',
+  'teal',
+  'tomato',
+  'violet',
+  'white',
+  'yellow',
+];
+
+const cuteAnimalNames = [
+  'bunny',
+  'puppy',
+  'kitten',
+  'chipmunk',
+  'hedgehog',
+  'dolphin',
+  'seal',
+  'turtle',
+  'penguin',
+  'parrot',
+  'hummingbird',
+  'kitten',
+  'chipmunk',
+  'squirrel',
+  'butterfly',
+  'dragonfly',
+  'ladybug',
+  'goldfish',
+  'puppyfish',
+  'guppy',
+  'hamster',
+  'gerbil',
+  'rabbit',
+  'ferret',
+  'chinchilla',
+];
+
+const qualities = [
+  'kind',
+  'honest',
+  'courage',
+  'humor',
+  'grace',
+  'wit',
+  'charm',
+  'passion',
+  'empathy',
+  'patience',
+  'optimism',
+  'joy',
+  'love',
+  'peace',
+  'serenity',
+  'wisdom',
+  'strength',
+  'resilience',
+  'perseverance',
+  'integrity',
+  'gratitude',
+  'humility',
+  'curiosity',
+];
+
+const createRandomName = () => {
+  const randomColor = Math.floor(Math.random() * colors.length);
+  const randomAnimal = Math.floor(Math.random() * cuteAnimalNames.length);
+  const randomQuality = Math.floor(Math.random() * qualities.length);
+  return (colors[randomColor] + '-' + cuteAnimalNames[randomAnimal] + '-' +
+    qualities[randomQuality]);
+};
+
+export default createRandomName;

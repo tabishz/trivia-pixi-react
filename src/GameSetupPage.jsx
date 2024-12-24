@@ -92,7 +92,7 @@ function GameSetupPage({ game }) {
 
   return (
     <div>
-      <h1>Game Session: {sessionId}</h1>
+      <h1>{game.name}</h1>
       <div id='setup'>
         <input
           type='text'
