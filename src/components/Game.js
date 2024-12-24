@@ -1,4 +1,5 @@
 import axios from 'axios';
+import icons from './icons.js';
 import Player from './Player.js';
 
 const QUESTIONS_API_URL = '';
@@ -61,10 +62,16 @@ class Game {
     return;
   }
 
-  setPlayerIcon(icon, id) {
+  /**
+   * Updates a player's Icon
+   * @param {String} iconName name of the icon
+   * @param {String} id Player's ID
+   * @returns
+   */
+  setPlayerIcon(iconName, id) {
     const thePlayer = this.findPlayer(id);
-    if (thePlayer && this.iconAvailable(icon)) {
-      thePlayer.setIcon(icon);
+    if (thePlayer && this.iconAvailable(iconName)) {
+      thePlayer.setIcon(iconName);
       this.updateChosenIcons();
     }
     return;
@@ -86,10 +93,24 @@ class Game {
     });
   }
 
+  chooseRandomIcon() {
+    const iconNames = Object.keys(icons);
+    const availableIcons = iconNames.filter(icon =>
+      !this.chosenIcons.includes(icon)
+    );
+    console.log(availableIcons);
+    const randomIcon = Math.floor(Math.random() * availableIcons.length);
+    return iconNames[randomIcon];
+  }
+
   addPlayer(name) {
     if (this.playerExists(name)) { return false; }
     const player = new Player(name);
+    console.log(`Created player ${player.name} with ID: ${player.id}`);
+    const iconName = this.chooseRandomIcon();
+    console.log(`Random Icon Name: ${iconName}`);
     this.players.push(player);
+    this.setPlayerIcon(iconName, player.id);
     return player;
   }
 
@@ -108,6 +129,7 @@ class Game {
     if (this.currentTurn >= this.players.length) {
       this.currentTurn = 0;
     }
+    this.updateChosenIcons();
   }
 
   nextTurn() {
