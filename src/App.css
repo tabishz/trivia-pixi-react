@@ -4,7 +4,7 @@
 
 .main {
   margin: auto;
-  display: flex;
+  display: block;
   justify-content: center;
   align-items: center;
   height: 80vh;
@@ -192,4 +192,34 @@ li.players {
 .popup-content button {
   padding: 5px 10px;
   margin-right: 10px;
+}
+
+/* Game Sessions List */
+.gameSessions {
+  display: block;
+}
+
+ul.gameSessions {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+li.gameSessions {
+  border: 2px solid;
+  background-color: cornsilk;
+  border-radius: 3rem;
+  padding: 1rem 3rem 1rem 3rem;
+  margin-bottom: 5px;
+  cursor: pointer;
+  font-family: "Courier New", monospace;
+  font-size: 2em;
+}
+
+li.gameSessions:hover {
+  background-color: #4ac6f3;
 }

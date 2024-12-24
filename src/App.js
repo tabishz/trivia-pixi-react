@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   BrowserRouter as Router,
   Route,
@@ -15,7 +15,7 @@ import './App.css';
 function App() {
   const [game, setGame] = useState(null); // Lift the game state up to here
   const [, setSessionId] = useState(null); // Session ID
-  const [gameSessions, setGameSessions] = useState([]); // game sessions
+  const [gameSessions, setGameSessions] = useState([]);
 
   return (
     <Router>
@@ -72,18 +72,21 @@ function HomePage({ setGame, setGameSessions, gameSessions, setSessionId }) {
         <h1>Return to Him</h1>
       </div>
       <div className='main'>
-        <ul>
-          {gameSessions.map((gameSession) => (
-            <li
-              key={gameSession.sessionId}
-              onClick={() => goToGameSession(gameSession.sessionId)}
-              className='gameSessionLink'
-            >
-              {gameSession.sessionId}
-            </li>
-          ))}
-        </ul>
-        <button onClick={startNewGame} className='button-30'>
+        <div className='gameSessions'>
+          <ul className='gameSessions'>
+            {gameSessions?.map((gameSession) => (
+              <li
+                key={gameSession.sessionId}
+                onClick={() => goToGameSession(gameSession.sessionId)}
+                className='gameSessions'
+              >
+                {gameSession.sessionId}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <button onClick={startNewGame} className='button-74'>
           Start a New Game
         </button>
       </div>
