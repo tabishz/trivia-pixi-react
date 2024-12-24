@@ -2,6 +2,8 @@ import PropTypes from 'prop-types';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
+import icons from './components/icons.js';
+
 function GameSetupPage({ game }) {
   const { sessionId } = useParams();
   const [playerName, setPlayerName] = useState('');
@@ -9,6 +11,7 @@ function GameSetupPage({ game }) {
   const [selectedPlayer, setSelectedPlayer] = useState(null);
   const [showMenu, setShowMenu] = useState(false);
   const [isEditing, setIsEditing] = useState(false); // State to track if we're editing
+  const [showIconMenu, setShowIconMenu] = useState(false);
   const menuRef = useRef(null); // Use ref to track the menu DOM element
   const navigate = useNavigate();
 
@@ -39,7 +42,7 @@ function GameSetupPage({ game }) {
       game.removePlayer(selectedPlayer.id);
     } else if (action === 'icon') {
       console.log(`Select icon for player: ${selectedPlayer.name}`);
-      // Add your profile logic here
+      setShowIconMenu(true);
     }
     setShowMenu(false); // Hide the menu after action
   };
@@ -47,6 +50,11 @@ function GameSetupPage({ game }) {
   // Handle the name change
   const handleNameChange = (event) => {
     setPlayerName(event.target.value);
+  };
+
+  const handleIconSelect = (iconName) => {
+    selectedPlayer.setIcon(iconName);
+    setShowIconMenu(false);
   };
 
   // Save the new player name
@@ -108,6 +116,7 @@ function GameSetupPage({ game }) {
               key={player.id}
               onContextMenu={(e) => editPlayerRightClick(e, player)}
             >
+              <img className='players' src={player.icon} />
               {player.name}
             </li>
           ))}
@@ -147,6 +156,28 @@ function GameSetupPage({ game }) {
               <button onClick={saveNewName}>Save</button>
               <button onClick={() => setIsEditing(false)}>Cancel</button>
             </div>
+          </div>
+        )}
+
+        {showIconMenu && (
+          <div className='icon-menu'>
+            <h3>Select an Icon</h3>
+            <div className='icon-grid'>
+              {Object.keys(icons).map((iconName) => (
+                <img
+                  key={iconName}
+                  src={icons[iconName]}
+                  alt={iconName}
+                  onClick={() => handleIconSelect(iconName)}
+                />
+              ))}
+            </div>
+            <button
+              onClick={() => setShowIconMenu(false)}
+              className='button-30'
+            >
+              Cancel
+            </button>
           </div>
         )}
       </div>

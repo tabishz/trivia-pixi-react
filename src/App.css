@@ -140,6 +140,11 @@ li.players {
   text-align: center;
 }
 
+img.players {
+  max-height: 2rem;
+  padding-right: 1rem;
+}
+
 /* Pop-up Menu for Players */
 .popup-menu {
   background-color: white;
@@ -222,4 +227,25 @@ li.gameSessions {
 
 li.gameSessions:hover {
   background-color: #4ac6f3;
+}
+
+/* Icon Selection Menu */
+.icon-menu {
+  /* Style your icon menu as needed (position, size, etc.) */
+  position: absolute; /* Or fixed, depending on your needs */
+  background-color: white;
+  border: 1px solid #ccc;
+  padding: 20px;
+}
+
+.icon-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(50px, 1fr)); /* Responsive grid */
+  gap: 10px;
+}
+
+.icon-grid img {
+  width: 100%;
+  height: auto;
+  cursor: pointer;
 }

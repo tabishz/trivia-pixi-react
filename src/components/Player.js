@@ -1,9 +1,12 @@
 import { v7 as uuidv7 } from 'uuid';
 
+import icons from './icons.js';
+
 class Player {
   constructor(name) {
     this.setName(name);
     this.id = this._generatePlayerId();
+    this.icon = null;
     this.score = 0;
     this.extraTurn = false;
     this.turnsTaken = 0;
@@ -31,6 +34,10 @@ class Player {
     let newName = name;
     if (name.length > 16) { newName = name.slice(0, 16); }
     this.name = newName;
+  }
+
+  setIcon(iconName) {
+    this.icon = icons[iconName];
   }
 
   /**
