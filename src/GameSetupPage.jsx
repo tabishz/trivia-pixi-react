@@ -37,8 +37,8 @@ function GameSetupPage({ game }) {
     } else if (action === 'delete') {
       console.log(`Deleting player: ${selectedPlayer.name}`);
       game.removePlayer(selectedPlayer.id);
-    } else if (action === 'profile') {
-      console.log(`Viewing profile of player: ${selectedPlayer.name}`);
+    } else if (action === 'icon') {
+      console.log(`Select icon for player: ${selectedPlayer.name}`);
       // Add your profile logic here
     }
     setShowMenu(false); // Hide the menu after action
@@ -129,9 +129,7 @@ function GameSetupPage({ game }) {
             <ul>
               <li onClick={() => handlePlayerOptions('edit')}>Edit</li>
               <li onClick={() => handlePlayerOptions('delete')}>Delete</li>
-              <li onClick={() => handlePlayerOptions('profile')}>
-                View Profile
-              </li>
+              <li onClick={() => handlePlayerOptions('icon')}>Select Icon</li>
             </ul>
           </div>
         )}

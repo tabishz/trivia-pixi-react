@@ -4,7 +4,7 @@ import Player from './Player.js';
 const QUESTIONS_API_URL = '';
 
 class Game {
-  constructor() {
+  constructor(sessionId = null) {
     this.players = [];
     this.currentTurn = 0; // Index of the current player in the players array
     this.startTime = Date.now();
@@ -13,8 +13,10 @@ class Game {
     this.questions = []; // Array to store questions
     this.attemptedQuestions = []; // Questions that have been played in session
     this.currentQuestion = null; // To hold the currently active question
-    this.sessionId = this.generateSessionId();
+    this.sessionId = sessionId || this.generateSessionId();
   }
+
+  // TODO: create Question class
 
   async start() {
     // Fetch 100 random questions from the questions bank via API call
@@ -119,6 +121,7 @@ class Game {
     if (!this.questions.length) {
       // Handle the case where there are no questions left (e.g., game over or fetch more questions)
       this.gameOver = true;
+      this.endTime = Date.now();
       return null;
     }
     // Get the last question in the Questions list (list already randomized)
@@ -139,11 +142,13 @@ class Game {
       const message = 'No questions.';
       console.log(message);
       this.gameOver = true;
+      this.endTime = Date.now();
     }
     if (this.players.length === 0) {
       const message = 'No Players.';
       console.log(message);
       this.gameOver = true;
+      this.endTime = Date.now();
     }
     return this.gameOver;
   }
@@ -171,6 +176,10 @@ class Game {
   getSessionId() {
     return this.sessionId;
   }
+
+  // Create functions for
+  // TODO: saveGameData: this will storage all game data in JSON format including players info
+  // TODO: loadGameData: this will recreated the game session from JSON data
 }
 
 export default Game;
