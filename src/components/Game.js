@@ -100,8 +100,9 @@ class Game {
     const availableIcons = iconNames.filter(icon =>
       !this.chosenIcons.includes(icon)
     );
+    console.log(`Available Icons: ${availableIcons}`);
     const randomIcon = Math.floor(Math.random() * availableIcons.length);
-    return iconNames[randomIcon];
+    return availableIcons[randomIcon];
   }
 
   addPlayer(name) {
