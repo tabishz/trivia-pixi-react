@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
+import EditPlayerPopup from './components/EditPlayerPopup.jsx';
 import icons from './components/icons.js';
 import PlayerContextMenu from './components/PlayerContextMenu.jsx';
 import PlayerList from './components/PlayerList.jsx';
@@ -92,36 +93,6 @@ function GameSetupPage({ game }) {
     navigate('/');
   };
 
-  // --- EditPlayerPopup Component ---
-  function EditPlayerPopup(
-    { isEditing, playerName, handleNameChange, saveNewName },
-  ) {
-    if (!isEditing) { return null; }
-
-    return (
-      <div className='edit-popup'>
-        <div className='popup-content'>
-          <h3>Edit Player Name</h3>
-          <input
-            type='text'
-            value={playerName}
-            onChange={handleNameChange}
-            maxLength={16}
-          />
-          <button onClick={saveNewName}>Save</button>
-          <button onClick={() => setIsEditing(false)}>Cancel</button>
-        </div>
-      </div>
-    );
-  }
-
-  EditPlayerPopup.propTypes = {
-    isEditing: PropTypes.bool.isRequired,
-    playerName: PropTypes.string.isRequired,
-    handleNameChange: PropTypes.func.isRequired,
-    saveNewName: PropTypes.func.isRequired,
-  };
-
   // --- IconSelectionMenu Component ---
   function IconSelectionMenu(
     { showIconMenu, icons, chosenIcons, handleIconSelect },
@@ -191,7 +162,9 @@ function GameSetupPage({ game }) {
 
         <EditPlayerPopup
           isEditing={isEditing}
+          setIsEditing={setIsEditing}
           playerName={playerName}
+          setPlayerName={setPlayerName}
           handleNameChange={handleNameChange}
           saveNewName={saveNewName}
         />
