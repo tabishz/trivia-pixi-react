@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 import EditPlayerPopup from './components/EditPlayerPopup.jsx';
 import icons from './components/icons.js';
+import IconSelectionMenu from './components/IconSelectionMenu.jsx';
 import PlayerContextMenu from './components/PlayerContextMenu.jsx';
 import PlayerList from './components/PlayerList.jsx';
 
@@ -93,41 +94,6 @@ function GameSetupPage({ game }) {
     navigate('/');
   };
 
-  // --- IconSelectionMenu Component ---
-  function IconSelectionMenu(
-    { showIconMenu, icons, chosenIcons, handleIconSelect },
-  ) {
-    if (!showIconMenu) { return null; }
-
-    return (
-      <div className='icon-menu'>
-        <h3>Select an Icon</h3>
-        <div className='icon-grid'>
-          {Object.keys(icons).filter(icon => !chosenIcons.includes(icon)).map((
-            iconName,
-          ) => (
-            <img
-              key={iconName}
-              src={icons[iconName]}
-              alt={iconName}
-              onClick={() => handleIconSelect(iconName)}
-            />
-          ))}
-        </div>
-        <button onClick={() => setShowIconMenu(false)} className='button-30'>
-          Cancel
-        </button>
-      </div>
-    );
-  }
-
-  IconSelectionMenu.propTypes = {
-    showIconMenu: PropTypes.bool.isRequired,
-    icons: PropTypes.object.isRequired,
-    chosenIcons: PropTypes.array.isRequired,
-    handleIconSelect: PropTypes.func.isRequired,
-  };
-
   return (
     <div>
       <h1>{game.name}</h1>
@@ -171,6 +137,7 @@ function GameSetupPage({ game }) {
 
         <IconSelectionMenu
           showIconMenu={showIconMenu}
+          setShowIconMenu={setShowIconMenu}
           icons={icons}
           chosenIcons={game?.chosenIcons || []}
           handleIconSelect={handleIconSelect}
