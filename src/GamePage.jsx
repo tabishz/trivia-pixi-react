@@ -1,4 +1,4 @@
-import { Container, Sprite, Stage } from '@pixi/react';
+import { Container, Sprite, Stage, Texture } from '@pixi/react';
 import PropTypes from 'prop-types';
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -8,6 +8,9 @@ import icons from './components/icons';
 function GamePage({ game }) {
   const [iconScale, setIconScale] = useState(0.1);
   const [playerPositions, setPlayerPositions] = useState({ x: 0, y: 0 });
+  const [baseLength, setBaseLength] = useState(
+    Math.min(window.innerHeight, window.innerWidth),
+  );
   // const { sessionId } = useParams();
   const navigate = useNavigate();
 
@@ -25,6 +28,18 @@ function GamePage({ game }) {
   useEffect(() => {
     // Calculate initial scale on component mount
     setIconScale(Math.min(window.innerWidth, window.innerHeight) / 10000);
+    // Function to handle window resize
+    const handleResize = () => {
+      setIconScale(Math.min(window.innerWidth, window.innerHeight) / 10000);
+    };
+
+    // Add event listener for window resize
+    window.addEventListener('resize', handleResize);
+
+    // Clean up the event listener on unmount
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
   }, []);
 
   useEffect(() => {
@@ -46,6 +61,19 @@ function GamePage({ game }) {
           height={window.innerHeight}
           options={{ backgroundColor: 0xeef1f5 }}
         >
+          <Container
+            position={[window.innerWidth / 2, window.innerHeight / 2]}
+          >
+            <Sprite
+              image={'/images/sample-board.png'}
+              position={{
+                x: 0 - (window.innerHeight / 2),
+                y: 0 - (window.innerHeight / 2),
+              }}
+              height={window.innerHeight}
+              width={window.innerHeight}
+            />
+          </Container>
           <Container position={[window.innerWidth / 2, window.innerHeight / 2]}>
             {game.players.map((player) => (
               <Container
