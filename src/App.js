@@ -36,7 +36,7 @@ function App() {
           element={<GameSetupPage game={game} />}
         />
         <Route
-          path='/game/:sessionId'
+          path='/play/:sessionId'
           element={<GamePage game={game} />}
         />
       </Routes>
@@ -80,13 +80,13 @@ function HomePage({ setGame, setGameSessions, gameSessions, setSessionId }) {
                 onClick={() => goToGameSession(gameSession.sessionId)}
                 className='gameSessions'
               >
-                {gameSession.sessionId}
+                {gameSession.name}
               </li>
             ))}
           </ul>
         </div>
 
-        <button onClick={startNewGame} className='button-74'>
+        <button onClick={startNewGame} className='button-retro'>
           Start a New Game
         </button>
       </div>

@@ -1,8 +1,19 @@
 import PropTypes from 'prop-types';
 import { useEffect, useRef, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  useNavigate,
+  useParams,
+} from 'react-router-dom';
 
+import EditPlayerPopup from './components/EditPlayerPopup.jsx';
 import icons from './components/icons.js';
+import IconSelectionMenu from './components/IconSelectionMenu.jsx';
+import PlayerContextMenu from './components/PlayerContextMenu.jsx';
+import PlayerList from './components/PlayerList.jsx';
+import GamePage from './GamePage.jsx';
 
 function GameSetupPage({ game }) {
   const { sessionId } = useParams();
@@ -52,16 +63,16 @@ function GameSetupPage({ game }) {
     setPlayerName(event.target.value);
   };
 
-  const handleIconSelect = (iconName) => {
-    game.setPlayerIcon(iconName, selectedPlayer.id);
-    setShowIconMenu(false);
-  };
-
   // Save the new player name
   const saveNewName = () => {
     game.setPlayerName(playerName, selectedPlayer.id);
     setIsEditing(false); // Close the edit pop-up
     setPlayerName('');
+  };
+
+  const handleIconSelect = (iconName) => {
+    game.setPlayerIcon(iconName, selectedPlayer.id);
+    setShowIconMenu(false);
   };
 
   const editPlayerRightClick = (event, player) => {
@@ -90,102 +101,68 @@ function GameSetupPage({ game }) {
     navigate('/');
   };
 
+  const startGame = () => {
+    navigate(`/play/${sessionId}`);
+  };
+
   return (
     <div>
-      <h1>Game Session: {sessionId}</h1>
       <div id='setup'>
+        <h1>{game.name}</h1>
         <input
           type='text'
           placeholder='Player Name'
           value={playerName}
           onChange={e => setPlayerName(e.target.value)}
           onKeyDown={handleKeyDown}
-          className='input-30'
+          className='input-flat-shadow'
         />
         <button
           onClick={addPlayer}
           disabled={!playerName}
-          className='button-30'
+          className='button-retro'
         >
           Add Player
         </button>
-        <ul className='players'>
-          {game?.getPlayers().map(player => (
-            <li
-              className='players'
-              key={player.id}
-              onContextMenu={(e) => editPlayerRightClick(e, player)}
-            >
-              <img className='players' src={icons[player.icon]} />
-              {player.name}
-            </li>
-          ))}
-        </ul>
-        {showMenu && (
-          <div
-            ref={menuRef} // Attach the ref to the menu element
-            className='popup-menu'
-            style={{
-              position: 'absolute',
-              top: menuPosition.y,
-              left: menuPosition.x,
-              background: '#fff',
-              border: '1px solid #ccc',
-              padding: '10px',
-              zIndex: 1000,
-            }}
-          >
-            <ul>
-              <li onClick={() => handlePlayerOptions('edit')}>Edit</li>
-              <li onClick={() => handlePlayerOptions('delete')}>Delete</li>
-              <li onClick={() => handlePlayerOptions('icon')}>Select Icon</li>
-            </ul>
-          </div>
-        )}
 
-        {isEditing && (
-          <div className='edit-popup'>
-            <div className='popup-content'>
-              <h3>Edit Player Name</h3>
-              <input
-                type='text'
-                value={playerName}
-                onChange={handleNameChange}
-                maxLength={16} // Limit the name to 16 characters
-              />
-              <button onClick={saveNewName}>Save</button>
-              <button onClick={() => setIsEditing(false)}>Cancel</button>
-            </div>
-          </div>
-        )}
+        <PlayerList
+          players={game?.getPlayers()}
+          onPlayerRightClick={editPlayerRightClick}
+        />
 
-        {showIconMenu && (
-          <div className='icon-menu'>
-            <h3>Select an Icon</h3>
-            <div className='icon-grid'>
-              {Object.keys(icons).filter(icon =>
-                !game?.chosenIcons?.includes(icon)
-              ).map((iconName) => (
-                <img
-                  key={iconName}
-                  src={icons[iconName]}
-                  alt={iconName}
-                  onClick={() => handleIconSelect(iconName)}
-                />
-              ))}
-            </div>
-            <button
-              onClick={() => setShowIconMenu(false)}
-              className='button-30'
-            >
-              Cancel
-            </button>
-          </div>
+        <PlayerContextMenu
+          showMenu={showMenu}
+          menuPosition={menuPosition}
+          handlePlayerOptions={handlePlayerOptions}
+          menuRef={menuRef}
+        />
+
+        <EditPlayerPopup
+          isEditing={isEditing}
+          setIsEditing={setIsEditing}
+          playerName={playerName}
+          setPlayerName={setPlayerName}
+          handleNameChange={handleNameChange}
+          saveNewName={saveNewName}
+        />
+
+        <IconSelectionMenu
+          showIconMenu={showIconMenu}
+          setShowIconMenu={setShowIconMenu}
+          icons={icons}
+          chosenIcons={game?.chosenIcons || []}
+          handleIconSelect={handleIconSelect}
+        />
+
+        {game.players.length > 1 && (
+          <button className='button-retro' onClick={startGame}>
+            Start Game!
+          </button>
         )}
       </div>
 
       <div className='bottom'>
-        <button onClick={goHome} className='button-30'>Back to Home</button>
+        <button onClick={goHome} className='button-retro'>Back to Home</button>
       </div>
     </div>
   );
