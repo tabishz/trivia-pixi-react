@@ -69,7 +69,9 @@ function HomePage({ setGame, setGameSessions, gameSessions, setSessionId }) {
   return (
     <div className='App'>
       <div className='title'>
-        <h1>Return to Him</h1>
+        <h1>
+          Quran <span id='challenge'>Challenge</span>
+        </h1>
       </div>
       <div className='main'>
         <div className='gameSessions'>
