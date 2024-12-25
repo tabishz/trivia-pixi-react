@@ -1,12 +1,19 @@
 import PropTypes from 'prop-types';
 import { useEffect, useRef, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  useNavigate,
+  useParams,
+} from 'react-router-dom';
 
 import EditPlayerPopup from './components/EditPlayerPopup.jsx';
 import icons from './components/icons.js';
 import IconSelectionMenu from './components/IconSelectionMenu.jsx';
 import PlayerContextMenu from './components/PlayerContextMenu.jsx';
 import PlayerList from './components/PlayerList.jsx';
+import GamePage from './GamePage.jsx';
 
 function GameSetupPage({ game }) {
   const { sessionId } = useParams();
@@ -94,6 +101,10 @@ function GameSetupPage({ game }) {
     navigate('/');
   };
 
+  const startGame = () => {
+    navigate(`/play/${sessionId}`);
+  };
+
   return (
     <div>
       <div id='setup'>
@@ -144,7 +155,9 @@ function GameSetupPage({ game }) {
         />
 
         {game.players.length > 1 && (
-          <button className='button-retro'>Start Game!</button>
+          <button className='button-retro' onClick={startGame}>
+            Start Game!
+          </button>
         )}
       </div>
 

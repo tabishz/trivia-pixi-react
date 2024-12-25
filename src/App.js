@@ -36,7 +36,7 @@ function App() {
           element={<GameSetupPage game={game} />}
         />
         <Route
-          path='/game/:sessionId'
+          path='/play/:sessionId'
           element={<GamePage game={game} />}
         />
       </Routes>

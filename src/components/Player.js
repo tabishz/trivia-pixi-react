@@ -5,6 +5,7 @@ class Player {
     this.setName(name);
     this.id = this._generatePlayerId();
     this.icon = null;
+    this.sprite = null;
     this.score = 0;
     this.extraTurn = false;
     this.turnsTaken = 0;
