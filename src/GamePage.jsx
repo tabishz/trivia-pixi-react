@@ -8,6 +8,8 @@ import icons from './components/icons';
 function GamePage({ game }) {
   const [iconScale, setIconScale] = useState(0.1);
   const [playerPositions, setPlayerPositions] = useState({ x: 0, y: 0 });
+  const [baseHeight, setBaseHeight] = useState(window.innerHeight);
+  const [baseWidth, setBaseWidth] = useState(window.innerWidth);
   const [baseLength, setBaseLength] = useState(
     Math.min(window.innerHeight, window.innerWidth),
   );
@@ -30,7 +32,10 @@ function GamePage({ game }) {
     setIconScale(Math.min(window.innerWidth, window.innerHeight) / 10000);
     // Function to handle window resize
     const handleResize = () => {
-      setIconScale(Math.min(window.innerWidth, window.innerHeight) / 10000);
+      setBaseLength(Math.min(window.innerHeight, window.innerWidth));
+      setBaseHeight(window.innerHeight);
+      setBaseWidth(window.innerWidth);
+      setIconScale(baseLength / 10000);
     };
 
     // Add event listener for window resize
@@ -57,24 +62,24 @@ function GamePage({ game }) {
     <div>
       <div>
         <Stage
-          width={window.innerWidth}
-          height={window.innerHeight}
+          width={baseWidth}
+          height={baseHeight}
           options={{ backgroundColor: 0xeef1f5 }}
         >
           <Container
-            position={[window.innerWidth / 2, window.innerHeight / 2]}
+            position={[baseWidth / 2, baseHeight / 2]}
           >
             <Sprite
-              image={'/images/sample-board.png'}
+              image={'/images/board.jpg'}
               position={{
-                x: 0 - (window.innerHeight / 2),
-                y: 0 - (window.innerHeight / 2),
+                x: 0 - (baseHeight / 2),
+                y: 0 - (baseHeight / 2),
               }}
-              height={window.innerHeight}
-              width={window.innerHeight}
+              height={baseLength}
+              width={baseLength}
             />
           </Container>
-          <Container position={[window.innerWidth / 2, window.innerHeight / 2]}>
+          <Container position={[baseWidth / 2, baseHeight / 2]}>
             {game.players.map((player) => (
               <Container
                 key={player.id}
@@ -97,7 +102,7 @@ function GamePage({ game }) {
         ))}
       </div>
       <div className='bottom'>
-        <button onClick={goHome} className='button-retro'>Back to Home</button>
+        <button onClick={goHome} className='button-retro'>&#127968;</button>
       </div>
     </div>
   );

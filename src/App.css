@@ -151,9 +151,8 @@
 
 /* title */
 .title h1 {
-  line-height: 1.3;
   background-clip: text;
-  background-image: linear-gradient(to right, #09f1b8, #00a2ff, #2aba2e, #fed90f);
+  background-image: linear-gradient(to right, #068465, #0077bc, #1f8522, #ab930b);
   color: #ffffff;
   font-weight: 200;
   font-family: Ultra;
