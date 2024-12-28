@@ -1,19 +1,12 @@
 import PropTypes from 'prop-types';
 import { useEffect, useRef, useState } from 'react';
-import {
-  BrowserRouter as Router,
-  Route,
-  Routes,
-  useNavigate,
-  useParams,
-} from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import EditPlayerPopup from './components/EditPlayerPopup.jsx';
 import icons from './components/icons.js';
 import IconSelectionMenu from './components/IconSelectionMenu.jsx';
 import PlayerContextMenu from './components/PlayerContextMenu.jsx';
 import PlayerList from './components/PlayerList.jsx';
-import GamePage from './GamePage.jsx';
 
 function GameSetupPage({ game }) {
   const { sessionId } = useParams();

@@ -124,15 +124,15 @@
 /* another button */
 .button-retro {
   background-color: #fbeee0;
-  border: 0.2vw solid #422800;
-  border-radius: 3vw;
-  box-shadow: #422800 0.25vw 0.25vw 0 0;
+  border: 0.2vh solid #422800;
+  border-radius: 3vh;
+  box-shadow: #422800 0.5vh 0.5vh 0 0;
   color: #422800;
   cursor: pointer;
   display: inline-block;
   font-weight: 600;
-  font-size: 2.5vw;
-  padding: 1vw 3vw;
+  font-size: 2.5vh;
+  padding: 1vh 3vh;
   text-align: center;
   text-decoration: none;
   user-select: none;
@@ -142,6 +142,7 @@
 
 .button-retro:hover {
   background-color: #fff;
+  box-shadow: #67430d 0.4vh 0.4vh 0 0;
 }
 
 .button-retro:active {

@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
   BrowserRouter as Router,
   Route,
@@ -60,7 +60,6 @@ function HomePage({ setGame, setGameSessions, gameSessions, setSessionId }) {
       return gameSession.sessionId === gameSessionId;
     });
     if (foundGame?.sessionId) {
-      console.log(`Found game: ${foundGame.sessionId}`);
       setGame(foundGame);
       navigate(`/game/${gameSessionId}`);
     }

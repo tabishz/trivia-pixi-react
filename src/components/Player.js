@@ -8,8 +8,6 @@ class Player {
     this.sprite = null;
     this.score = 0;
     this.location = 0;
-    this.x = 0;
-    this.y = 0;
     this.extraTurn = false;
     this.turnsTaken = 0;
     this.answers = [];
