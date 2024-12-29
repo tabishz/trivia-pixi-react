@@ -9,6 +9,7 @@ function GamePage({ game }) {
   const stageRef = useRef(null); // Ref for the PIXI.js Stage
   const [iconScale, setIconScale] = useState(0.1);
   const [players, setPlayers] = useState([]);
+  const [playerPositions, setPlayerPositions] = useState({});
   const [baseHeight, setBaseHeight] = useState(window.innerHeight);
   const [baseWidth, setBaseWidth] = useState(window.innerWidth);
   const [baseLength, setBaseLength] = useState(
@@ -82,12 +83,12 @@ function GamePage({ game }) {
       [...third, ...topRow],
       [...second, ...topRow],
       [...leftCol, ...topRow], // Top Left Slot (21)
-      [...second, ...leftCol],
-      [...third, ...leftCol],
-      [...fourth, ...leftCol],
-      [...fifth, ...leftCol],
-      [...sixth, ...leftCol],
-      [...seventh, ...leftCol], // Last Slot before Square One Slot (27)
+      [...leftCol, ...second],
+      [...leftCol, ...third],
+      [...leftCol, ...fourth],
+      [...leftCol, ...fifth],
+      [...leftCol, ...sixth],
+      [...leftCol, ...seventh], // Last Slot before Square One Slot (27)
     ];
     const centerCoords = slotCenters(slotCorners[slot]);
     console.log(centerCoords);
@@ -95,14 +96,21 @@ function GamePage({ game }) {
   };
 
   const handlePlayerMove = (player) => {
-    const newPlayersState = players.map(p => {
-      if (p.id === player.id) {
-        return ({ ...p, x: p.x + 10 });
-      }
-      return p;
+    setPlayerPositions({
+      ...playerPositions,
+      [player.id]: {
+        ...playerPositions[player.id],
+        location: playerPositions[player.id].location + 1,
+      },
     });
-    setPlayers(newPlayersState);
-    console.log(`Increasing Player ${player.name} x value by 10px.`);
+    // const newPlayersState = internalGame.players.map(p => {
+    //   if (p.id === player.id) {
+    //     return ({ ...p, location: p.location + 1 });
+    //   }
+    //   return p;
+    // });
+    // setInternalGame({ ...internalGame, players: newPlayersState });
+    console.log(`Increasing Player ${player.name} location by +1.`);
   };
 
   // Function to handle window resize
@@ -130,12 +138,22 @@ function GamePage({ game }) {
 
   useEffect(() => {
     // Initialize players with sprites and positions
+    const playerPos = {};
     const initialPlayers = game.players.map(player => ({
       ...player,
       sprite: <Sprite key={player.id} image={icons[player.icon]} />,
       x: 0,
       y: 0,
     }));
+    initialPlayers.forEach(player => {
+      playerPos[player.id] = {
+        location: player.location,
+        slot: 0,
+        x: player.x,
+        y: player.y,
+      };
+    });
+    setPlayerPositions(playerPos);
     setPlayers(initialPlayers);
   }, []);
 
@@ -143,11 +161,12 @@ function GamePage({ game }) {
     // Update icon positions when playerPositions change
     setPlayers(prevPlayers => (
       prevPlayers.map(player => {
-        const [xPos, yPos] = calculatePositionFromSlotLocation(player.location);
-        return { ...player, x: xPos, y: yPos };
+        const newLocation = playerPositions[player.id]?.location || 0;
+        const [xPos, yPos] = calculatePositionFromSlotLocation(newLocation);
+        return { ...player, location: newLocation, x: xPos, y: yPos };
       })
     ));
-  }, []);
+  }, [playerPositions]);
 
   useEffect(() => {
     // Add event listener for window resize
