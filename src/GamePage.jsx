@@ -17,6 +17,83 @@ function GamePage({ game }) {
   // const { sessionId } = useParams();
   const navigate = useNavigate();
 
+  /**
+   * Returns the center coordinate for given rectable with corners coordinates
+   * @param {Int8Array} coordinates x1, x2, y1, y2 coordinates in array
+   * @return {Array} of [x, y] coordinates for center of the slot
+   */
+  const slotCenters = (coordinates) => {
+    const [x1, x2, y1, y2] = coordinates;
+    const x = (x1 + ((x2 - x1) / 2)) * baseLength;
+    const y = (y1 + ((y2 - y1) / 2)) * baseLength;
+    // Adjusted coordinates from center
+    const xCenter = x - (baseLength / 2);
+    const yCenter = y - (baseLength / 2);
+    return [xCenter, yCenter];
+  };
+
+  /**
+   * @param {Number} location An integer of player location (which is based on turns)
+   * @returns {Array} [x,y] cordinates for player position on board
+   */
+  const calculatePositionFromSlotLocation = (location) => {
+    const slot = location % 28; // Number of boxes on board
+    const grid = [
+      0,
+      35 / 216,
+      5 / 18,
+      3 / 8,
+      1 / 2,
+      11 / 18,
+      155 / 216,
+      5 / 6,
+      1,
+    ];
+    const topRow = grid.slice(0, 2);
+    const second = grid.slice(1, 3);
+    const third = grid.slice(2, 4);
+    const fourth = grid.slice(3, 5);
+    const fifth = grid.slice(4, 6);
+    const sixth = grid.slice(5, 7);
+    const seventh = grid.slice(6, 8);
+    const bottomRow = grid.slice(7, 9);
+    const rightCol = grid.slice(7, 9);
+    const leftCol = grid.slice(0, 2);
+    const slotCorners = [
+      [...leftCol, ...bottomRow], // First Slot (0)
+      [...second, ...bottomRow], // Second Slot (1)
+      [...third, ...bottomRow], // Third Slot (2)
+      [...fourth, ...bottomRow],
+      [...fifth, ...bottomRow],
+      [...sixth, ...bottomRow],
+      [...seventh, ...bottomRow],
+      [...rightCol, ...bottomRow], // Right Corner Slot (7)
+      [...rightCol, ...seventh],
+      [...rightCol, ...sixth],
+      [...rightCol, ...fifth],
+      [...rightCol, ...fourth],
+      [...rightCol, ...third],
+      [...rightCol, ...second],
+      [...rightCol, ...topRow], // Top Right Slot (14)
+      [...seventh, ...topRow],
+      [...sixth, ...topRow],
+      [...fifth, ...topRow],
+      [...fourth, ...topRow],
+      [...third, ...topRow],
+      [...second, ...topRow],
+      [...leftCol, ...topRow], // Top Left Slot (21)
+      [...second, ...leftCol],
+      [...third, ...leftCol],
+      [...fourth, ...leftCol],
+      [...fifth, ...leftCol],
+      [...sixth, ...leftCol],
+      [...seventh, ...leftCol], // Last Slot before Square One Slot (27)
+    ];
+    const centerCoords = slotCenters(slotCorners[slot]);
+    console.log(centerCoords);
+    return centerCoords;
+  };
+
   const handlePlayerMove = (player) => {
     const newPlayersState = players.map(p => {
       if (p.id === player.id) {
@@ -62,16 +139,15 @@ function GamePage({ game }) {
     setPlayers(initialPlayers);
   }, []);
 
-  // useEffect(() => {
-  //   // Update sprite positions when playerPositions change
-  //   setPlayers(prevPlayers =>
-  //     prevPlayers.map(player => ({
-  //       ...player,
-  //       x: 0,
-  //       y: 0,
-  //     }))
-  //   );
-  // }, []);
+  useEffect(() => {
+    // Update icon positions when playerPositions change
+    setPlayers(prevPlayers => (
+      prevPlayers.map(player => {
+        const [xPos, yPos] = calculatePositionFromSlotLocation(player.location);
+        return { ...player, x: xPos, y: yPos };
+      })
+    ));
+  }, []);
 
   useEffect(() => {
     // Add event listener for window resize
