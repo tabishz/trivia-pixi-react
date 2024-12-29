@@ -1,6 +1,6 @@
 import { Container, Sprite, Stage } from '@pixi/react';
 import PropTypes from 'prop-types';
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import icons from './components/icons';
@@ -8,7 +8,7 @@ import icons from './components/icons';
 function GamePage({ game }) {
   const stageRef = useRef(null); // Ref for the PIXI.js Stage
   const [iconScale, setIconScale] = useState(0.1);
-  const [playerPositions, setPlayerPositions] = useState({});
+  const [players, setPlayers] = useState([]);
   const [baseHeight, setBaseHeight] = useState(window.innerHeight);
   const [baseWidth, setBaseWidth] = useState(window.innerWidth);
   const [baseLength, setBaseLength] = useState(
@@ -18,14 +18,14 @@ function GamePage({ game }) {
   const navigate = useNavigate();
 
   const handlePlayerMove = (player) => {
-    setPlayerPositions(prevPositions => ({
-      ...prevPositions,
-      [player.id]: {
-        ...prevPositions[player.id],
-        x: (prevPositions[player.id]?.x || 0) + 10,
-      },
-    }));
-    console.log(`Increasing Player ${player.name} x value to: ${player.x}`);
+    const newPlayersState = players.map(p => {
+      if (p.id === player.id) {
+        return ({ ...p, x: p.x + 10 });
+      }
+      return p;
+    });
+    setPlayers(newPlayersState);
+    console.log(`Increasing Player ${player.name} x value by 10px.`);
   };
 
   // Function to handle window resize
@@ -52,16 +52,28 @@ function GamePage({ game }) {
   };
 
   useEffect(() => {
-    if (playerPositions[game.players[0].id] === undefined) {
-      const positions = {};
-      game.players.forEach(player => {
-        positions[player.id] = { x: baseLength / 2, y: baseLength / 2 };
-      });
-      setPlayerPositions(positions);
-      console.log('Setting player positions.');
-      return;
-    }
+    // Initialize players with sprites and positions
+    const initialPlayers = game.players.map(player => ({
+      ...player,
+      sprite: <Sprite key={player.id} image={icons[player.icon]} />,
+      x: 0,
+      y: 0,
+    }));
+    setPlayers(initialPlayers);
+  }, []);
 
+  // useEffect(() => {
+  //   // Update sprite positions when playerPositions change
+  //   setPlayers(prevPlayers =>
+  //     prevPlayers.map(player => ({
+  //       ...player,
+  //       x: 0,
+  //       y: 0,
+  //     }))
+  //   );
+  // }, []);
+
+  useEffect(() => {
     // Add event listener for window resize
     window.addEventListener('resize', handleWindowResize);
 
@@ -94,13 +106,15 @@ function GamePage({ game }) {
   }, [baseLength]);
 
   useEffect(() => {
-    // Load sprites after iconScale is calculated
-    // console.log(`new Icon Scale: ${iconScale}`);
-    game.players.forEach(player => {
-      player.sprite = (
-        <Sprite key={player.id} image={icons[player.icon]} scale={iconScale} />
-      );
-    });
+    // Update sprite positions and sizes when players array changes
+    setPlayers(prevPlayers =>
+      prevPlayers.map(player => ({
+        ...player,
+        sprite: React.cloneElement(player.sprite, {
+          scale: iconScale,
+        }),
+      }))
+    );
   }, [iconScale]);
 
   const goHome = () => {
@@ -128,10 +142,10 @@ function GamePage({ game }) {
               height={baseLength}
               width={baseLength}
             />
-            {game.players.map((player) => (
+            {players.map(player => (
               <Container
                 key={player.id}
-                position={playerPositions[player.id] || { x: 0, y: 0 }}
+                position={[player.x, player.y]}
               >
                 {player.sprite}
               </Container>
@@ -140,7 +154,7 @@ function GamePage({ game }) {
         </Stage>
       </div>
       <div className='playerButtons'>
-        {game.players.map((player) => (
+        {players.map((player) => (
           <button
             key={player.id}
             onClick={() => handlePlayerMove(player)}

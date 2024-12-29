@@ -41,9 +41,9 @@ function EditPlayerPopup(
 
 EditPlayerPopup.propTypes = {
   isEditing: PropTypes.bool.isRequired,
-  setIsEditing: PropTypes.bool.isRequired,
-  setPlayerName: PropTypes.bool.isRequired,
-  handleKeyDown: PropTypes.bool.isRequired,
+  setIsEditing: PropTypes.func.isRequired,
+  setPlayerName: PropTypes.func.isRequired,
+  handleKeyDown: PropTypes.func.isRequired,
   playerName: PropTypes.string.isRequired,
   handleNameChange: PropTypes.func.isRequired,
   saveNewName: PropTypes.func.isRequired,
