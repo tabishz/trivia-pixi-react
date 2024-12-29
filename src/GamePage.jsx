@@ -124,10 +124,6 @@ function GamePage({ game }) {
           >
             <Sprite
               image={'/images/board.jpg'}
-              // position={{
-              //   x: 0 - (baseHeight / 2),
-              //   y: 0 - (baseHeight / 2),
-              // }}
               anchor={0.5}
               height={baseLength}
               width={baseLength}

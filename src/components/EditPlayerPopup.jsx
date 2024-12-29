@@ -8,6 +8,7 @@ function EditPlayerPopup(
     playerName,
     setPlayerName,
     handleNameChange,
+    handleKeyDown,
     saveNewName,
   },
 ) {
@@ -21,6 +22,7 @@ function EditPlayerPopup(
           type='text'
           value={playerName}
           onChange={handleNameChange}
+          onKeyDown={handleKeyDown}
           maxLength={16}
         />
         <button onClick={saveNewName}>Save</button>
@@ -39,6 +41,9 @@ function EditPlayerPopup(
 
 EditPlayerPopup.propTypes = {
   isEditing: PropTypes.bool.isRequired,
+  setIsEditing: PropTypes.bool.isRequired,
+  setPlayerName: PropTypes.bool.isRequired,
+  handleKeyDown: PropTypes.bool.isRequired,
   playerName: PropTypes.string.isRequired,
   handleNameChange: PropTypes.func.isRequired,
   saveNewName: PropTypes.func.isRequired,
