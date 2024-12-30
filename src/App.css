@@ -310,11 +310,12 @@ li.gameSessions:hover {
 /* Score Matrix */
 .score-matrix {
   position: fixed;
-  top: 20px;
-  right: 20px;
+  top: 2vh;
+  right: 2vh;
   background-color: white;
-  padding: 10px;
-  border-radius: 5px;
+  padding: 1vh;
+  font-size: 2vh;
+  border-radius: 1vh;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   z-index: 10;
 }
@@ -324,7 +325,7 @@ li.gameSessions:hover {
 }
 
 img.mini-icons {
-  max-height: 2vh;
+  max-height: 2.5vh;
   padding: 0 0.3vw;
 }
 
