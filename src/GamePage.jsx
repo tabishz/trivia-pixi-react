@@ -203,15 +203,61 @@ function GamePage({ game }) {
     setPlayers(initialPlayers);
   }, []);
 
+  const calculateIconOffset = (indexInSlot, numPlayers) => {
+    if (numPlayers == 2) {
+      return {
+        xOff: (indexInSlot - (numPlayers - 1) / 2) * (baseLength * 0.04),
+        yOff: 0,
+      };
+    }
+    if (numPlayers > 2 && numPlayers < 5) {
+      let yOff = 0;
+      if (indexInSlot >= 2) {
+        yOff = -1 * baseLength * 0.05;
+      }
+      return {
+        xOff: (indexInSlot % 2) * (baseLength * 0.05),
+        yOff: yOff,
+      };
+    }
+  };
+
   useEffect(() => {
     // Update icon positions when playerPositions change
-    setPlayers(prevPlayers => (
-      prevPlayers.map(player => {
+    setPlayers(prevPlayers => {
+      const playersByLocation = {};
+      prevPlayers.forEach(player => {
+        const location = playerPositions[player.id]?.location || 0;
+        if (!playersByLocation[location]) {
+          playersByLocation[location] = [];
+        }
+        playersByLocation[location].push(player.id);
+      });
+      return prevPlayers.map(player => {
         const newLocation = playerPositions[player.id]?.location || 0;
+        const playersInSlot = playersByLocation[newLocation]; // Array of players in the slot
+        const numPlayers = playersInSlot.length;
+        let newScale = iconScale;
+        // Adjust position to distribute players evenly in the slot
+        const indexInSlot = playersInSlot.indexOf(player.id);
+        let xOff = 0;
+        let yOff = 0;
+        if (numPlayers > 1) {
+          const offset = calculateIconOffset(indexInSlot, numPlayers);
+          xOff = offset.xOff;
+          yOff = offset.yOff;
+          newScale = newScale * Math.sqrt(numPlayers / 4);
+        }
         const [xPos, yPos] = calculatePositionFromSlotLocation(newLocation);
-        return { ...player, location: newLocation, x: xPos, y: yPos };
-      })
-    ));
+        return {
+          ...player,
+          sprite: React.cloneElement(player.sprite, { scale: newScale }),
+          location: newLocation,
+          x: xPos + xOff,
+          y: yPos + yOff,
+        };
+      });
+    });
   }, [playerPositions, baseLength]);
 
   useEffect(() => {
@@ -227,6 +273,14 @@ function GamePage({ game }) {
       window.removeEventListener('resize', handleWindowResize);
     };
   }, [handleWindowResize]);
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [readyForNextTurn, diceResult]);
 
   // useEffect(() => {
   //   // recalculates Player Positions
@@ -265,6 +319,19 @@ function GamePage({ game }) {
   const goHome = () => {
     window.removeEventListener('resize', handleWindowResize);
     navigate('/');
+  };
+
+  const handleKeyDown = (event) => {
+    if (event.key === ' ' && readyForNextTurn) {
+      console.log(`[SPACEBAR] pressed. Next Turn? ${readyForNextTurn}`);
+      if (readyForNextTurn) {
+        handleNextTurn();
+      }
+    }
+    if ((event.key === 'r' || event.key === 'R') && !readyForNextTurn) {
+      console.log(`[${event.key}] pressed. Next Turn? ${readyForNextTurn}`);
+      handlePlayerTurn();
+    }
   };
 
   return (
@@ -332,7 +399,9 @@ function GamePage({ game }) {
           </p>
           {diceResult && <p>Dice Roll: {diceResult}</p>}
           {readyForNextTurn && (
-            <button onClick={handleNextTurn}>Next Turn</button>
+            <button onClick={handleNextTurn}>
+              Next Turn
+            </button>
           )}
           {!readyForNextTurn && (
             <button onClick={handlePlayerTurn}>Roll Dice</button>
