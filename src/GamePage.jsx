@@ -98,16 +98,16 @@ function GamePage({ game }) {
     return centerCoords;
   };
 
-  const handlePlayerMove = (player, moveBy = 1) => {
-    setPlayerPositions({
-      ...playerPositions,
-      [player.id]: {
-        ...playerPositions[player.id],
-        location: playerPositions[player.id].location + moveBy,
-      },
-    });
-    console.log(`Increasing Player ${player.name} location by +${moveBy}.`);
-  };
+  // const handlePlayerMove = (player, moveBy = 1) => {
+  //   setPlayerPositions({
+  //     ...playerPositions,
+  //     [player.id]: {
+  //       ...playerPositions[player.id],
+  //       location: playerPositions[player.id].location + moveBy,
+  //     },
+  //   });
+  //   console.log(`Increasing Player ${player.name} location by +${moveBy}.`);
+  // };
 
   const animatePlayerMovement = (player, moveBy) => {
     setReadyForNextTurn(false); // Disable Next Turn button
@@ -212,7 +212,7 @@ function GamePage({ game }) {
         return { ...player, location: newLocation, x: xPos, y: yPos };
       })
     ));
-  }, [playerPositions]);
+  }, [playerPositions, baseLength]);
 
   useEffect(() => {
     game.players = players;
