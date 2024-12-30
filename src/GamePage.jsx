@@ -210,14 +210,26 @@ function GamePage({ game }) {
         yOff: 0,
       };
     }
-    if (numPlayers > 2 && numPlayers < 5) {
+    if (numPlayers > 2 && numPlayers < 7) {
       let yOff = 0;
-      if (indexInSlot >= 2) {
-        yOff = -1 * baseLength * 0.05;
+      if ([0, 1].includes(indexInSlot)) {
+        yOff = baseLength * 0.05;
+      }
+      if ([2, 3].includes(indexInSlot)) {
+        yOff = -0.3 * baseLength * 0.05;
+      }
+      if ([4, 5].includes(indexInSlot)) {
+        yOff = -0.1 * baseLength * 0.5;
       }
       return {
         xOff: (indexInSlot % 2) * (baseLength * 0.05),
         yOff: yOff,
+      };
+    }
+    if (numPlayers >= 7) {
+      return {
+        xOff: 0,
+        yOff: 0,
       };
     }
   };
@@ -246,7 +258,7 @@ function GamePage({ game }) {
           const offset = calculateIconOffset(indexInSlot, numPlayers);
           xOff = offset.xOff;
           yOff = offset.yOff;
-          newScale = newScale * Math.sqrt(numPlayers / 4);
+          newScale = newScale * Math.sqrt(numPlayers / 5);
         }
         const [xPos, yPos] = calculatePositionFromSlotLocation(newLocation);
         return {
