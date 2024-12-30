@@ -113,7 +113,6 @@ function GamePage({ game }) {
     setReadyForNextTurn(false); // Disable Next Turn button
 
     let currentLocation = playerPositions[player.id].location;
-    const targetLocation = currentLocation + moveBy;
 
     // GSAP timeline for the animation
     const tl = gsap.timeline({
@@ -269,13 +268,14 @@ function GamePage({ game }) {
   };
 
   return (
-    <div>
+    <div className='gamePage'>
       <div className='score-matrix'>
         {/* Add a container for the score matrix */}
         <table>
           <thead>
             <tr>
               <th>Player</th>
+              <th></th>
               <th>Score</th>
             </tr>
           </thead>
@@ -283,6 +283,9 @@ function GamePage({ game }) {
             {game.players.map(player => (
               <tr key={player.id}>
                 <td>{player.name}</td>
+                <td>
+                  <img className='mini-icons' src={icons[player.icon]} />
+                </td>
                 <td>{player.score}</td>
               </tr>
             ))}
@@ -320,7 +323,13 @@ function GamePage({ game }) {
       </div>
       <div className='game-ui'>
         <div>
-          <p>Current Player: {game.players[currentPlayer]?.name}</p>
+          <p>
+            Current Player: {game.players[currentPlayer]?.name}{' '}
+            <img
+              className='mini-icons'
+              src={icons[game.players[currentPlayer]?.icon]}
+            />
+          </p>
           {diceResult && <p>Dice Roll: {diceResult}</p>}
           {readyForNextTurn && (
             <button onClick={handleNextTurn}>Next Turn</button>
@@ -329,16 +338,6 @@ function GamePage({ game }) {
             <button onClick={handlePlayerTurn}>Roll Dice</button>
           )}
         </div>
-      </div>
-      <div className='playerButtons'>
-        {players.map((player) => (
-          <button
-            key={player.id}
-            onClick={() => handlePlayerMove(player)}
-          >
-            Move Player {player.name}
-          </button>
-        ))}
       </div>
       <div className='bottom'>
         <button onClick={goHome} className='button-retro'>&#127968;</button>
