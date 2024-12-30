@@ -32,9 +32,6 @@ class Game {
     return false;
   }
 
-  determineSlotDetails() {}
-  presentQuestion() {}
-
   async playTurn(player) {
     await player.playerToRollDice();
     await player.movePlayerToSlot();
@@ -214,6 +211,7 @@ class Game {
   }
 
   findPlayer(id) {
+    console.log(`finding Player: ${id}`);
     const thePlayer = this.players.find(player => {
       return player.id === id;
     });
@@ -224,9 +222,52 @@ class Game {
     return this.sessionId;
   }
 
-  // Create functions for
-  // TODO: saveGameData: this will storage all game data in JSON format including players info
-  // TODO: loadGameData: this will recreated the game session from JSON data
+  // Exports player data in importable format
+  exportPlayersData() {
+    return this.players.map(player => {
+      return player.exportData();
+    });
+  }
+
+  importPlayersData(playersData) {
+    return playersData.map(playerData => {
+      const newPlayer = new Player(playerData.name, playerData.id);
+      newPlayer.importData(playerData);
+      return newPlayer;
+    });
+  }
+
+  saveGameData() {
+    const gameData = {
+      players: this.exportPlayersData(),
+      currentTurn: this.currentTurn,
+      startTime: this.startTime,
+      endTime: this.endTime,
+      gameOver: this.gameOver,
+      questions: this.questions,
+      attemptedQuestions: this.attemptedQuestions,
+      sessionId: this.sessionId,
+      chosenIcons: this.chosenIcons,
+      name: this.name,
+    };
+    return gameData;
+  }
+
+  loadGameData(gameData) {
+    if (!gameData) {
+      return;
+    }
+    this.players = this.importPlayersData(gameData);
+    this.currentTurn = gameData.currentTurn;
+    this.startTime = gameData.startTime;
+    this.endTime = gameData.endTime;
+    this.gameOver = gameData.gameOver;
+    this.questions = gameData.questions;
+    this.attemptedQuestions = gameData.attemptedQuestions;
+    this.sessionId = gameData.sessionId;
+    this.chosenIcons = gameData.chosenIcons;
+    this.name = gameData.name;
+  }
 }
 
 export default Game;
