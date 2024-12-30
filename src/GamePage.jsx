@@ -10,6 +10,9 @@ function GamePage({ game }) {
   const [iconScale, setIconScale] = useState(0.1);
   const [players, setPlayers] = useState([]);
   const [playerPositions, setPlayerPositions] = useState({});
+  const [currentPlayer, setCurrentPlayer] = useState(0);
+  const [readyForNextTurn, setReadyForNextTurn] = useState(false);
+  const [diceResult, setDiceResult] = useState(null);
   const [baseHeight, setBaseHeight] = useState(window.innerHeight);
   const [baseWidth, setBaseWidth] = useState(window.innerWidth);
   const [baseLength, setBaseLength] = useState(
@@ -94,15 +97,31 @@ function GamePage({ game }) {
     return centerCoords;
   };
 
-  const handlePlayerMove = (player) => {
+  const handlePlayerMove = (player, moveBy = 1) => {
     setPlayerPositions({
       ...playerPositions,
       [player.id]: {
         ...playerPositions[player.id],
-        location: playerPositions[player.id].location + 1,
+        location: playerPositions[player.id].location + moveBy,
       },
     });
-    console.log(`Increasing Player ${player.name} location by +1.`);
+    console.log(`Increasing Player ${player.name} location by +${moveBy}.`);
+  };
+
+  const handlePlayerTurn = () => {
+    // 1. Roll the die (generate a random number between 1 and 6)
+    const newDiceResult = Math.floor(Math.random() * 6) + 1;
+    setDiceResult(newDiceResult);
+    // 2. Update player location based on die roll (using your existing logic)
+    handlePlayerMove(players[currentPlayer], newDiceResult);
+    // 3. Enable Next Turn Button
+    setReadyForNextTurn(true);
+  };
+
+  const handleNextTurn = () => {
+    setCurrentPlayer(prevPlayer => (prevPlayer + 1) % game.players.length);
+    setDiceResult(null);
+    setReadyForNextTurn(false);
   };
 
   // Function to handle window resize
@@ -142,7 +161,6 @@ function GamePage({ game }) {
     initialPlayers.forEach(player => {
       playerPos[player.id] = {
         location: player.location,
-        slot: 0,
         x: player.x,
         y: player.y,
       };
@@ -264,6 +282,18 @@ function GamePage({ game }) {
             ))}
           </Container>
         </Stage>
+      </div>
+      <div className='game-ui'>
+        <div>
+          <p>Current Player: {game.players[currentPlayer]?.name}</p>
+          {diceResult && <p>Dice Roll: {diceResult}</p>}
+          {readyForNextTurn && (
+            <button onClick={handleNextTurn}>Next Turn</button>
+          )}
+          {!readyForNextTurn && (
+            <button onClick={handlePlayerTurn}>Roll Dice</button>
+          )}
+        </div>
       </div>
       <div className='playerButtons'>
         {players.map((player) => (

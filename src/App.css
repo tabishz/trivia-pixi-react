@@ -321,3 +321,16 @@ li.gameSessions:hover {
 .score-matrix td {
   text-align: center;
 }
+
+/* Game UI */
+.game-ui {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* Center vertically and horizontally */
+  background-color: white;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+}
