@@ -14,7 +14,6 @@ import './App.css';
 
 function App() {
   const [game, setGame] = useState(null); // Lift the game state up to here
-  const [, setSessionId] = useState(null); // Session ID
   const [gameSessions, setGameSessions] = useState([]);
 
   return (
@@ -27,7 +26,6 @@ function App() {
               setGame={setGame}
               setGameSessions={setGameSessions}
               gameSessions={gameSessions}
-              setSessionId={setSessionId}
             />
           }
         />
@@ -44,24 +42,23 @@ function App() {
   );
 }
 
-function HomePage({ setGame, setGameSessions, gameSessions, setSessionId }) {
+function HomePage({ setGame, setGameSessions, gameSessions }) {
   const navigate = useNavigate(); // Initialize useNavigate
 
   const startNewGame = () => {
     const newGame = new Game();
     setGame(newGame); // Store in state.
-    setSessionId(newGame.sessionId); // Store in state.
     setGameSessions([...gameSessions, newGame]);
     navigate(`/game/${newGame.sessionId}`); // Redirect to the game page
   };
 
   const goToGameSession = (gameSessionId) => {
-    const foundGame = gameSessions.find(gameSession => {
-      return gameSession.sessionId === gameSessionId;
-    });
+    const foundGame = gameSessions.find(gameSession =>
+      gameSession.sessionId === gameSessionId
+    );
     if (foundGame?.sessionId) {
       setGame(foundGame);
-      navigate(`/game/${gameSessionId}`);
+      navigate(`/game/${foundGame.sessionId}`);
     }
   };
 
@@ -69,7 +66,7 @@ function HomePage({ setGame, setGameSessions, gameSessions, setSessionId }) {
     <div className='App'>
       <div className='title'>
         <h1>
-          Quran <span id='challenge'>Challenge</span>
+          Q. <span id='challenge'>Challenge</span>
         </h1>
       </div>
       <div className='main'>
@@ -101,7 +98,6 @@ HomePage.propTypes = {
   setGameSessions: PropTypes.func.isRequired, // 'setGameSessions' is a function
   gameSessions: PropTypes.array.isRequired, // 'gameSessions' is an array
   sessionId: PropTypes.string,
-  setSessionId: PropTypes.func.isRequired,
 };
 
 export default App;
