@@ -1,4 +1,5 @@
 import { Container, Sprite, Stage } from '@pixi/react';
+import { gsap } from 'gsap';
 import PropTypes from 'prop-types';
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -108,12 +109,46 @@ function GamePage({ game }) {
     console.log(`Increasing Player ${player.name} location by +${moveBy}.`);
   };
 
+  const animatePlayerMovement = (player, moveBy) => {
+    setReadyForNextTurn(false); // Disable Next Turn button
+
+    let currentLocation = playerPositions[player.id].location;
+    const targetLocation = currentLocation + moveBy;
+
+    // GSAP timeline for the animation
+    const tl = gsap.timeline({
+      onComplete: () => {
+        setReadyForNextTurn(true); // Enable Next Turn button after animation
+      },
+    });
+
+    for (let i = 1; i <= moveBy; i++) {
+      const newLocation = currentLocation + i;
+      const [xPos, yPos] = calculatePositionFromSlotLocation(newLocation);
+
+      tl.to(player, {
+        duration: 0.2, // 200ms per slot
+        x: xPos,
+        y: yPos,
+        onUpdate: () => {
+          // Update playerPositions state during the animation
+          setPlayerPositions(prevPositions => ({
+            ...prevPositions,
+            [player.id]: { ...prevPositions[player.id], location: newLocation },
+          }));
+        },
+      });
+    }
+  };
+
   const handlePlayerTurn = () => {
     // 1. Roll the die (generate a random number between 1 and 6)
     const newDiceResult = Math.floor(Math.random() * 6) + 1;
     setDiceResult(newDiceResult);
     // 2. Update player location based on die roll (using your existing logic)
-    handlePlayerMove(players[currentPlayer], newDiceResult);
+    // handlePlayerMove(players[currentPlayer], newDiceResult);
+    // Animate the player movement over the slots
+    animatePlayerMovement(players[currentPlayer], newDiceResult);
     // 3. Enable Next Turn Button
     setReadyForNextTurn(true);
   };
