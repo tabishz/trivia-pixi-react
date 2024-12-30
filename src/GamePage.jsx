@@ -292,7 +292,7 @@ function GamePage({ game }) {
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [readyForNextTurn, diceResult]);
+  }, [readyForNextTurn, diceResult, players]);
 
   // useEffect(() => {
   //   // recalculates Player Positions
