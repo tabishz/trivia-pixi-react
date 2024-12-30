@@ -91,7 +91,6 @@ function GamePage({ game }) {
       [...leftCol, ...seventh], // Last Slot before Square One Slot (27)
     ];
     const centerCoords = slotCenters(slotCorners[slot]);
-    console.log(centerCoords);
     return centerCoords;
   };
 
@@ -103,13 +102,6 @@ function GamePage({ game }) {
         location: playerPositions[player.id].location + 1,
       },
     });
-    // const newPlayersState = internalGame.players.map(p => {
-    //   if (p.id === player.id) {
-    //     return ({ ...p, location: p.location + 1 });
-    //   }
-    //   return p;
-    // });
-    // setInternalGame({ ...internalGame, players: newPlayersState });
     console.log(`Increasing Player ${player.name} location by +1.`);
   };
 
@@ -141,7 +133,9 @@ function GamePage({ game }) {
     const playerPos = {};
     const initialPlayers = game.players.map(player => ({
       ...player,
-      sprite: <Sprite key={player.id} image={icons[player.icon]} />,
+      sprite: (
+        <Sprite key={player.id} image={icons[player.icon]} anchor={0.5} />
+      ),
       x: 0,
       y: 0,
     }));
@@ -167,6 +161,10 @@ function GamePage({ game }) {
       })
     ));
   }, [playerPositions]);
+
+  useEffect(() => {
+    game.players = players;
+  }, [players]);
 
   useEffect(() => {
     // Add event listener for window resize
@@ -219,6 +217,25 @@ function GamePage({ game }) {
 
   return (
     <div>
+      <div className='score-matrix'>
+        {/* Add a container for the score matrix */}
+        <table>
+          <thead>
+            <tr>
+              <th>Player</th>
+              <th>Score</th>
+            </tr>
+          </thead>
+          <tbody>
+            {game.players.map(player => (
+              <tr key={player.id}>
+                <td>{player.name}</td>
+                <td>{player.score}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
       <div>
         <Stage
           width={baseWidth}
