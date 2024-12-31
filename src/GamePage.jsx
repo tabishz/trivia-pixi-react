@@ -11,7 +11,7 @@ function GamePage({ game }) {
   const [iconScale, setIconScale] = useState(0.1);
   // const [players, setPlayers] = useState(game.players);
   const [playerPositions, setPlayerPositions] = useState({});
-  const [currentPlayer, setCurrentPlayer] = useState(0);
+  // const [currentPlayer, setCurrentPlayer] = useState(0);
   const [readyForNextTurn, setReadyForNextTurn] = useState(false);
   const [diceResult, setDiceResult] = useState(null);
   const [extraTurn, setExtraTurn] = useState(false);
@@ -165,7 +165,7 @@ function GamePage({ game }) {
 
   const handlePlayerTurn = () => {
     // TODO: use Game class functions to update players.
-    const player = game.players[currentPlayer];
+    const player = game.players[game.currentPlayer];
     // 1. Roll the die (generate a random number between 1 and 6)
     const newDiceResult = Math.floor(Math.random() * 6) + 1;
     setDiceResult(newDiceResult);
@@ -182,9 +182,10 @@ function GamePage({ game }) {
   };
 
   const handleNextTurn = () => {
-    const player = game.players[currentPlayer];
+    const player = game.players[game.currentPlayer];
     if (!player.extraTurn) {
-      setCurrentPlayer(prevPlayer => (prevPlayer + 1) % game.players.length);
+      // setCurrentPlayer(prevPlayer => (prevPlayer + 1) % game.players.length);
+      game.setNextPlayerAsCurrent();
     } else {
       player.endExtraTurn();
       setExtraTurn(false);
@@ -404,10 +405,10 @@ function GamePage({ game }) {
       <div className='game-ui'>
         <div>
           <p>
-            Current Player: {game.players[currentPlayer]?.name}{' '}
+            Current Player: {game.players[game.currentPlayer]?.name}{' '}
             <img
               className='mini-icons'
-              src={icons[game.players[currentPlayer]?.icon]}
+              src={icons[game.players[game.currentPlayer]?.icon]}
             />
           </p>
           {extraTurn && <p>Extra Turn!</p>}
