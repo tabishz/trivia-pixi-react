@@ -1,14 +1,17 @@
 import { v7 as uuidv7 } from 'uuid';
 
 class Player {
-  constructor(name) {
+  constructor(name, id = null) {
     this.setName(name);
-    this.id = this._generatePlayerId();
+    this.id = id || this._generatePlayerId();
     this.icon = null;
     this.sprite = null;
     this.score = 0;
+    this.location = 0;
     this.extraTurn = false;
     this.turnsTaken = 0;
+    this.x = 0;
+    this.y = 0;
     this.answers = [];
   }
 
@@ -54,6 +57,10 @@ class Player {
     this.turnsTaken++;
   }
 
+  updateLocation(numOfSlotsToMove) {
+    this.location = this.location + numOfSlotsToMove;
+  }
+
   /**
    * Records the question, answer and the whether the answer was correct
    * @param {String} question The Question
@@ -79,6 +86,31 @@ class Player {
 
   getTurns() {
     return this.turnsTaken;
+  }
+
+  exportData() {
+    const playerData = {
+      name: this.name,
+      id: this.id,
+      icon: this.icon,
+      sprite: this.sprite,
+      score: this.score,
+      location: this.location,
+      extraTurn: this.extraTurn,
+      turnsTaken: this.turnsTaken,
+      answers: this.answers,
+    };
+    return playerData;
+  }
+
+  importData(playerData) {
+    this.icon = playerData.icon;
+    this.sprite = playerData.sprite;
+    this.score = playerData.score;
+    this.location = playerData.location;
+    this.extraTurn = playerData.extraTurn;
+    this.turnsTaken = playerData.turnsTaken;
+    this.answers = playerData.answers;
   }
 
   async playerToRollDice() {

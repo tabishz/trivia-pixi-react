@@ -12,7 +12,7 @@ function PlayerList({ players, onPlayerRightClick }) {
           onContextMenu={(e) => onPlayerRightClick(e, player)}
         >
           <img
-            className='players'
+            className='mini-icons'
             src={icons[player.icon]}
             alt={player.name}
           />

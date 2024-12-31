@@ -1,19 +1,12 @@
 import PropTypes from 'prop-types';
 import { useEffect, useRef, useState } from 'react';
-import {
-  BrowserRouter as Router,
-  Route,
-  Routes,
-  useNavigate,
-  useParams,
-} from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import EditPlayerPopup from './components/EditPlayerPopup.jsx';
 import icons from './components/icons.js';
 import IconSelectionMenu from './components/IconSelectionMenu.jsx';
 import PlayerContextMenu from './components/PlayerContextMenu.jsx';
 import PlayerList from './components/PlayerList.jsx';
-import GamePage from './GamePage.jsx';
 
 function GameSetupPage({ game }) {
   const { sessionId } = useParams();
@@ -24,6 +17,7 @@ function GameSetupPage({ game }) {
   const [isEditing, setIsEditing] = useState(false); // State to track if we're editing
   const [showIconMenu, setShowIconMenu] = useState(false);
   const menuRef = useRef(null); // Use ref to track the menu DOM element
+  const playerNameInputRef = useRef(null);
   const navigate = useNavigate();
 
   const addPlayer = () => {
@@ -97,6 +91,11 @@ function GameSetupPage({ game }) {
     };
   }, []);
 
+  useEffect(() => {
+    // Focus on the input when the component mounts
+    playerNameInputRef.current.focus();
+  }, []);
+
   const goHome = () => {
     navigate('/');
   };
@@ -111,11 +110,13 @@ function GameSetupPage({ game }) {
         <h1>{game.name}</h1>
         <input
           type='text'
+          id='playerName'
           placeholder='Player Name'
           value={playerName}
           onChange={e => setPlayerName(e.target.value)}
           onKeyDown={handleKeyDown}
           className='input-flat-shadow'
+          ref={playerNameInputRef}
         />
         <button
           onClick={addPlayer}
@@ -143,6 +144,7 @@ function GameSetupPage({ game }) {
           playerName={playerName}
           setPlayerName={setPlayerName}
           handleNameChange={handleNameChange}
+          handleKeyDown={handleKeyDown}
           saveNewName={saveNewName}
         />
 
