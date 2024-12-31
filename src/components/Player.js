@@ -10,6 +10,8 @@ class Player {
     this.location = 0;
     this.extraTurn = false;
     this.turnsTaken = 0;
+    this.x = 0;
+    this.y = 0;
     this.answers = [];
   }
 

@@ -9,11 +9,12 @@ import icons from './components/icons';
 function GamePage({ game }) {
   const stageRef = useRef(null); // Ref for the PIXI.js Stage
   const [iconScale, setIconScale] = useState(0.1);
-  const [players, setPlayers] = useState([]);
+  // const [players, setPlayers] = useState(game.players);
   const [playerPositions, setPlayerPositions] = useState({});
   const [currentPlayer, setCurrentPlayer] = useState(0);
   const [readyForNextTurn, setReadyForNextTurn] = useState(false);
   const [diceResult, setDiceResult] = useState(null);
+  const [extraTurn, setExtraTurn] = useState(false);
   const [baseHeight, setBaseHeight] = useState(window.innerHeight);
   const [baseWidth, setBaseWidth] = useState(window.innerWidth);
   const [baseLength, setBaseLength] = useState(
@@ -21,6 +22,28 @@ function GamePage({ game }) {
   );
   // const { sessionId } = useParams();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Initialize players with sprites and positions
+    const playerPos = {};
+    game.players.forEach(player => {
+      player.sprite = (
+        <Sprite key={player.id} image={icons[player.icon]} anchor={0.5} />
+      );
+      playerPos[player.id] = {
+        location: player.location,
+        x: player.x,
+        y: player.y,
+      };
+    });
+    setPlayerPositions(playerPos);
+  }, []);
+
+  // Make sure Players are Players Class Objects
+  // useEffect(() => {
+  //   game.players = game.importPlayersData(game.players);
+  //   console.log('Converting Players Array to Player Class Objects');
+  // }, []);
 
   /**
    * Returns the center coordinate for given rectable with corners coordinates
@@ -141,19 +164,31 @@ function GamePage({ game }) {
   };
 
   const handlePlayerTurn = () => {
+    // TODO: use Game class functions to update players.
+    const player = game.players[currentPlayer];
     // 1. Roll the die (generate a random number between 1 and 6)
     const newDiceResult = Math.floor(Math.random() * 6) + 1;
     setDiceResult(newDiceResult);
+    if (newDiceResult === 6) {
+      setExtraTurn(true);
+      player.giveExtraTurn();
+    }
     // 2. Update player location based on die roll (using your existing logic)
     // handlePlayerMove(players[currentPlayer], newDiceResult);
     // Animate the player movement over the slots
-    animatePlayerMovement(players[currentPlayer], newDiceResult);
+    animatePlayerMovement(player, newDiceResult);
     // 3. Enable Next Turn Button
     setReadyForNextTurn(true);
   };
 
   const handleNextTurn = () => {
-    setCurrentPlayer(prevPlayer => (prevPlayer + 1) % game.players.length);
+    const player = game.players[currentPlayer];
+    if (!player.extraTurn) {
+      setCurrentPlayer(prevPlayer => (prevPlayer + 1) % game.players.length);
+    } else {
+      player.endExtraTurn();
+      setExtraTurn(false);
+    }
     setDiceResult(null);
     setReadyForNextTurn(false);
   };
@@ -180,28 +215,6 @@ function GamePage({ game }) {
       setBaseWidth(window.innerWidth);
     }
   };
-
-  useEffect(() => {
-    // Initialize players with sprites and positions
-    const playerPos = {};
-    const initialPlayers = game.players.map(player => ({
-      ...player,
-      sprite: (
-        <Sprite key={player.id} image={icons[player.icon]} anchor={0.5} />
-      ),
-      x: 0,
-      y: 0,
-    }));
-    initialPlayers.forEach(player => {
-      playerPos[player.id] = {
-        location: player.location,
-        x: player.x,
-        y: player.y,
-      };
-    });
-    setPlayerPositions(playerPos);
-    setPlayers(initialPlayers);
-  }, []);
 
   const calculateIconOffset = (indexInSlot, numPlayers) => {
     if (numPlayers == 2) {
@@ -235,46 +248,54 @@ function GamePage({ game }) {
   };
 
   useEffect(() => {
+    // TODO: use Game functions to update Player Objects
     // Update icon positions when playerPositions change
-    setPlayers(prevPlayers => {
-      const playersByLocation = {};
-      prevPlayers.forEach(player => {
-        const location = playerPositions[player.id]?.location || 0;
-        if (!playersByLocation[location]) {
-          playersByLocation[location] = [];
-        }
-        playersByLocation[location].push(player.id);
+    const playersByLocation = {};
+    game.players.forEach(player => {
+      const newLocation = playerPositions[player.id]?.location || 0;
+      if (!playersByLocation[newLocation]) {
+        playersByLocation[newLocation] = [];
+      }
+      playersByLocation[newLocation].push(player.id);
+    });
+    game.players.forEach(player => {
+      const newLocation = playerPositions[player.id]?.location || 0;
+      const playersInSlot = playersByLocation[newLocation]; // Array of players in the slot
+      const numPlayers = playersInSlot.length;
+      let newScale = iconScale;
+      // Adjust position to distribute players evenly in the slot
+      const indexInSlot = playersInSlot.indexOf(player.id);
+      let xOff = 0;
+      let yOff = 0;
+      if (numPlayers > 1) {
+        const offset = calculateIconOffset(indexInSlot, numPlayers);
+        xOff = offset.xOff;
+        yOff = offset.yOff;
+        newScale = newScale * Math.sqrt(numPlayers / 5);
+      }
+      const [xPos, yPos] = calculatePositionFromSlotLocation(newLocation);
+      player.sprite = React.cloneElement(player.sprite, {
+        scale: newScale,
       });
-      return prevPlayers.map(player => {
-        const newLocation = playerPositions[player.id]?.location || 0;
-        const playersInSlot = playersByLocation[newLocation]; // Array of players in the slot
-        const numPlayers = playersInSlot.length;
-        let newScale = iconScale;
-        // Adjust position to distribute players evenly in the slot
-        const indexInSlot = playersInSlot.indexOf(player.id);
-        let xOff = 0;
-        let yOff = 0;
-        if (numPlayers > 1) {
-          const offset = calculateIconOffset(indexInSlot, numPlayers);
-          xOff = offset.xOff;
-          yOff = offset.yOff;
-          newScale = newScale * Math.sqrt(numPlayers / 5);
-        }
-        const [xPos, yPos] = calculatePositionFromSlotLocation(newLocation);
-        return {
-          ...player,
-          sprite: React.cloneElement(player.sprite, { scale: newScale }),
-          location: newLocation,
-          x: xPos + xOff,
-          y: yPos + yOff,
-        };
-      });
+      player.location = newLocation;
+      player.x = xPos + xOff;
+      player.y = yPos + yOff;
     });
   }, [playerPositions, baseLength]);
 
-  useEffect(() => {
-    game.players = players;
-  }, [players]);
+  // useEffect(() => {
+  //   players.forEach(p => {
+  //     const player = game.findPlayer(p.id);
+  //     player.score = p.score;
+  //     player.location = p.location;
+  //     player.sprite = p.sprite;
+  //     player.x = p.x;
+  //     player.y = p.y;
+  //     player.turnsTaken = p.turnsTaken;
+  //     player.extraTurn = p.extraTurn;
+  //     player.score = p.score;
+  //   });
+  // }, [players]);
 
   useEffect(() => {
     // Add event listener for window resize
@@ -292,24 +313,7 @@ function GamePage({ game }) {
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [readyForNextTurn, diceResult, players]);
-
-  // useEffect(() => {
-  //   // recalculates Player Positions
-  //   const newPositions = {};
-  //   // Calculate scaling factors
-  //   const scaleX = window.innerWidth / baseWidth;
-  //   const scaleY = window.innerHeight / baseHeight;
-  //   game.players.forEach(player => {
-  //     newPositions[player.id] = {
-  //       x: playerPositions[player.id].x +
-  //         ((window.innerWidth - baseWidth) / 2),
-  //       y: playerPositions[player.id].y +
-  //         ((window.innerHeight - baseHeight) / 2),
-  //     };
-  //   });
-  //   setPlayerPositions(newPositions);
-  // }, [baseLength, baseHeight, baseWidth]);
+  }, [readyForNextTurn, diceResult, game]);
 
   // Updates Icon Scale when baseLength changes
   useEffect(() => {
@@ -318,14 +322,11 @@ function GamePage({ game }) {
 
   useEffect(() => {
     // Update sprite positions and sizes when players array changes
-    setPlayers(prevPlayers =>
-      prevPlayers.map(player => ({
-        ...player,
-        sprite: React.cloneElement(player.sprite, {
-          scale: iconScale,
-        }),
-      }))
-    );
+    game.players.forEach(player => {
+      player.sprite = React.cloneElement(player.sprite, {
+        scale: iconScale,
+      });
+    });
   }, [iconScale]);
 
   const goHome = () => {
@@ -389,7 +390,7 @@ function GamePage({ game }) {
               height={baseLength}
               width={baseLength}
             />
-            {players.map(player => (
+            {game.players.map(player => (
               <Container
                 key={player.id}
                 position={[player.x, player.y]}
@@ -409,6 +410,7 @@ function GamePage({ game }) {
               src={icons[game.players[currentPlayer]?.icon]}
             />
           </p>
+          {extraTurn && <p>Extra Turn!</p>}
           {diceResult && <p>Dice Roll: {diceResult}</p>}
           {readyForNextTurn && (
             <button onClick={handleNextTurn}>
