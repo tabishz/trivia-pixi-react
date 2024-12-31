@@ -8,7 +8,7 @@ const QUESTIONS_API_URL = '';
 class Game {
   constructor(gameName = null, sessionId = null) {
     this.players = [];
-    this.currentTurn = 0; // Index of the current player in the players array
+    this.currentPlayer = 0; // Index of the current player in the players array
     this.startTime = Date.now();
     this.endTime = null;
     this.gameOver = false;
@@ -122,28 +122,33 @@ class Game {
 
   removePlayer(id) {
     this.players = this.players.filter(player => player.id !== id);
-    if (this.currentTurn >= this.players.length) {
-      this.currentTurn = 0;
+    if (this.currentPlayer >= this.players.length) {
+      this.currentPlayer = 0;
     }
     this.updateChosenIcons();
   }
 
+  setNextPlayerAsCurrent() {
+    this.currentPlayer = (this.currentPlayer + 1) % this.players.length;
+  }
+
   nextTurn() {
-    this.isGameOver();
-    if (this.gameOver) {
-      return false;
-    }
-    const player = this.players[this.currentTurn];
+    // TODO: implement game over logic
+    // this.isGameOver();
+    // if (this.gameOver) {
+    //   return false;
+    // }
+    const player = this.players[this.currentPlayer];
     player.incrementTurns(); // Increment turns for the current player
     // If a player gets extra turn, then give this player extra turn
     if (player.extraTurn === true) {
       player.endExtraTurn();
       return player;
     }
-    this.currentTurn = (this.currentTurn + 1) % this.players.length; // Move to next player
+    this.currentPlayer = (this.currentPlayer + 1) % this.players.length; // Move to next player
     // Get a new question for the next player
     this.currentQuestion = this.getNextQuestion();
-    const nextPlayer = this.players[this.currentTurn];
+    const nextPlayer = this.players[this.currentPlayer];
     return nextPlayer;
   }
 
@@ -178,7 +183,7 @@ class Game {
     if (this.gameOver || this.players.length === 0) {
       return null;
     }
-    return this.players[this.currentTurn];
+    return this.players[this.currentPlayer];
   }
 
   isGameOver() {
@@ -199,7 +204,7 @@ class Game {
 
   resetGame() {
     this.players.forEach(player => player.resetScore());
-    this.currentTurn = 0;
+    this.currentPlayer = 0;
     this.gameOver = false;
     this.questions = [];
     this.attemptedQuestions = [];
@@ -240,7 +245,7 @@ class Game {
   saveGameData() {
     const gameData = {
       players: this.exportPlayersData(),
-      currentTurn: this.currentTurn,
+      currentPlayer: this.currentPlayer,
       startTime: this.startTime,
       endTime: this.endTime,
       gameOver: this.gameOver,
@@ -258,7 +263,7 @@ class Game {
       return;
     }
     this.players = this.importPlayersData(gameData);
-    this.currentTurn = gameData.currentTurn;
+    this.currentPlayer = gameData.currentPlayer;
     this.startTime = gameData.startTime;
     this.endTime = gameData.endTime;
     this.gameOver = gameData.gameOver;
