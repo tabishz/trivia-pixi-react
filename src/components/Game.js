@@ -128,6 +128,10 @@ class Game {
     this.updateChosenIcons();
   }
 
+  getCurrentPlayer() {
+    return this.players[this.currentPlayer];
+  }
+
   setNextPlayerAsCurrent() {
     this.currentPlayer = (this.currentPlayer + 1) % this.players.length;
   }
@@ -177,13 +181,6 @@ class Game {
     const question = this.questions.pop();
     this.attemptedQuestions.push(question);
     return question;
-  }
-
-  getCurrentPlayer() {
-    if (this.gameOver || this.players.length === 0) {
-      return null;
-    }
-    return this.players[this.currentPlayer];
   }
 
   isGameOver() {

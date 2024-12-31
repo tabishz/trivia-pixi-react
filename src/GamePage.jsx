@@ -165,7 +165,8 @@ function GamePage({ game }) {
 
   const handlePlayerTurn = () => {
     // TODO: use Game class functions to update players.
-    const player = game.players[game.currentPlayer];
+    // TODO: add function to store player turn history
+    const player = game.getCurrentPlayer();
     // 1. Roll the die (generate a random number between 1 and 6)
     const newDiceResult = Math.floor(Math.random() * 6) + 1;
     setDiceResult(newDiceResult);
@@ -182,7 +183,8 @@ function GamePage({ game }) {
   };
 
   const handleNextTurn = () => {
-    const player = game.players[game.currentPlayer];
+    const player = game.getCurrentPlayer();
+    player.incrementTurns();
     if (!player.extraTurn) {
       // setCurrentPlayer(prevPlayer => (prevPlayer + 1) % game.players.length);
       game.setNextPlayerAsCurrent();
