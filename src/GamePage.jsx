@@ -10,7 +10,6 @@ function GamePage({ game }) {
   const stageRef = useRef(null); // Ref for the PIXI.js Stage
   const [iconScale, setIconScale] = useState(0.1);
   // const [players, setPlayers] = useState(game.players);
-  const [playerPositions, setPlayerPositions] = useState({});
   // const [currentPlayer, setCurrentPlayer] = useState(0);
   const [readyForNextTurn, setReadyForNextTurn] = useState(false);
   const [diceResult, setDiceResult] = useState(null);
@@ -22,33 +21,6 @@ function GamePage({ game }) {
   );
   // const { sessionId } = useParams();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    // Initialize players with sprites and positions
-    const playerPos = {};
-    game.players.forEach(player => {
-      player.sprite = (
-        <Sprite key={player.id} image={icons[player.icon]} anchor={0.5} />
-      );
-      const [playerX, playerY] = calculatePositionFromSlotLocation(
-        player.location,
-      );
-      playerPos[player.id] = {
-        location: player.location,
-        x: playerX,
-        y: playerY,
-      };
-      player.x = playerX;
-      player.y = playerY;
-    });
-    setPlayerPositions(playerPos);
-  }, []);
-
-  // Make sure Players are Players Class Objects
-  // useEffect(() => {
-  //   game.players = game.importPlayersData(game.players);
-  //   console.log('Converting Players Array to Player Class Objects');
-  // }, []);
 
   /**
    * Returns the center coordinate for given rectable with corners coordinates
@@ -126,90 +98,34 @@ function GamePage({ game }) {
     return centerCoords;
   };
 
-  const animatePlayerMovement = (player, moveBy) => {
-    setReadyForNextTurn(false); // Disable Next Turn button
-
-    let currentLocation = playerPositions[player.id].location;
-
-    // GSAP timeline for the animation
-    const tl = gsap.timeline({
-      onComplete: () => {
-        setReadyForNextTurn(true); // Enable Next Turn button after animation
-      },
-    });
-
-    for (let i = 1; i <= moveBy; i++) {
-      const newLocation = currentLocation + i;
-      const [xPos, yPos] = calculatePositionFromSlotLocation(newLocation);
-
-      tl.to(player, {
-        duration: 0.2, // 200ms per slot
-        x: xPos,
-        y: yPos,
-        onUpdate: () => {
-          // Update playerPositions state during the animation
-          setPlayerPositions(prevPositions => ({
-            ...prevPositions,
-            [player.id]: { ...prevPositions[player.id], location: newLocation },
-          }));
-        },
-      });
+  const calculateIconOffset = (indexInSlot, numPlayers) => {
+    if (numPlayers == 2) {
+      return {
+        xOff: (indexInSlot - (numPlayers - 1) / 2) * (baseLength * 0.04),
+        yOff: 0,
+      };
     }
-  };
-
-  const handlePlayerTurn = () => {
-    // TODO: use Game class functions to update players.
-    // TODO: add function to store player turn history
-    const player = game.getCurrentPlayer();
-    // 1. Roll the die (generate a random number between 1 and 6)
-    const newDiceResult = Math.floor(Math.random() * 6) + 1;
-    setDiceResult(newDiceResult);
-    if (newDiceResult === 6) {
-      setExtraTurn(true);
-      player.giveExtraTurn();
+    if (numPlayers > 2 && numPlayers < 7) {
+      let yOff = 0;
+      if ([0, 1].includes(indexInSlot)) {
+        yOff = baseLength * 0.05;
+      }
+      if ([2, 3].includes(indexInSlot)) {
+        yOff = -0.3 * baseLength * 0.05;
+      }
+      if ([4, 5].includes(indexInSlot)) {
+        yOff = -0.1 * baseLength * 0.5;
+      }
+      return {
+        xOff: (indexInSlot % 2) * (baseLength * 0.05),
+        yOff: yOff,
+      };
     }
-    // 2. Update player location based on die roll (using your existing logic)
-    // handlePlayerMove(players[currentPlayer], newDiceResult);
-    // Animate the player movement over the slots
-    animatePlayerMovement(player, newDiceResult);
-    // 3. Enable Next Turn Button
-    setReadyForNextTurn(true);
-  };
-
-  const handleNextTurn = () => {
-    const player = game.getCurrentPlayer();
-    player.incrementTurns();
-    if (!player.extraTurn) {
-      // setCurrentPlayer(prevPlayer => (prevPlayer + 1) % game.players.length);
-      game.setNextPlayerAsCurrent();
-    } else {
-      player.endExtraTurn();
-      setExtraTurn(false);
-    }
-    setDiceResult(null);
-    setReadyForNextTurn(false);
-  };
-
-  // Function to handle window resize
-  const handleWindowResize = () => {
-    const newBaseLength = Math.min(window.innerHeight, window.innerWidth);
-    const newBaseHeight = window.innerHeight;
-    const newBaseWidth = window.innerWidth;
-    if (
-      newBaseLength !== baseLength && Math.abs(newBaseLength - baseLength) > 2
-    ) {
-      setBaseLength(Math.min(window.innerHeight, window.innerWidth));
-    }
-    if (
-      newBaseHeight !== baseHeight && Math.abs(newBaseHeight - baseHeight) > 2
-    ) {
-      setBaseHeight(window.innerHeight);
-    }
-    // console.log(`new baseWidth: ${newBaseWidth} | old: ${baseWidth}`);
-    if (
-      newBaseWidth !== baseWidth && Math.abs(newBaseWidth - baseWidth) > 2
-    ) {
-      setBaseWidth(window.innerWidth);
+    if (numPlayers >= 7) {
+      return {
+        xOff: 0,
+        yOff: 0,
+      };
     }
   };
 
@@ -249,43 +165,131 @@ function GamePage({ game }) {
     });
   };
 
-  const calculateIconOffset = (indexInSlot, numPlayers) => {
-    if (numPlayers == 2) {
-      return {
-        xOff: (indexInSlot - (numPlayers - 1) / 2) * (baseLength * 0.04),
-        yOff: 0,
+  const initPlayerPositions = () => {
+    // Initialize players with sprites and positions
+    const playerPos = {};
+    game.players.forEach(player => {
+      player.sprite = (
+        <Sprite
+          key={player.id}
+          image={icons[player.icon]}
+          anchor={0.5}
+          scale={iconScale}
+        />
+      );
+      const [playerX, playerY] = calculatePositionFromSlotLocation(
+        player.location,
+      );
+      playerPos[player.id] = {
+        location: player.location,
+        x: playerX,
+        y: playerY,
       };
+      // player.x = playerX;
+      // player.y = playerY;
+    });
+    return playerPos;
+  };
+  const [playerPositions, setPlayerPositions] = useState(initPlayerPositions());
+
+  // Make sure Players are Players Class Objects
+  // useEffect(() => {
+  //   game.players = game.importPlayersData(game.players);
+  //   console.log('Converting Players Array to Player Class Objects');
+  // }, []);
+
+  const animatePlayerMovement = async (player, moveBy) => {
+    setReadyForNextTurn(false); // Disable Next Turn button
+    let currentLocation = playerPositions[player.id].location;
+
+    // GSAP timeline for the animation
+    await new Promise(resolve => {
+      const tl = gsap.timeline({
+        onComplete: () => {
+          setReadyForNextTurn(true); // Enable Next Turn button after animation
+          resolve();
+        },
+      });
+
+      for (let i = 1; i <= moveBy; i++) {
+        const newLocation = currentLocation + i;
+        const [xPos, yPos] = calculatePositionFromSlotLocation(newLocation);
+
+        tl.to(player, {
+          duration: 0.2, // 200ms per slot
+          x: xPos,
+          y: yPos,
+          onUpdate: () => {
+            // Update playerPositions state during the animation
+            setPlayerPositions(prevPositions => ({
+              ...prevPositions,
+              [player.id]: {
+                ...prevPositions[player.id],
+                location: newLocation,
+              },
+            }));
+          },
+        });
+      }
+    });
+  };
+
+  const handlePlayerTurn = async () => {
+    // TODO: use Game class functions to update players.
+    // TODO: add function to store player turn history
+    const player = game.getCurrentPlayer();
+    // 1. Roll the die (generate a random number between 1 and 6)
+    const newDiceResult = Math.floor(Math.random() * 6) + 1;
+    setDiceResult(newDiceResult);
+    if (newDiceResult === 6) {
+      setExtraTurn(true);
+      player.giveExtraTurn();
     }
-    if (numPlayers > 2 && numPlayers < 7) {
-      let yOff = 0;
-      if ([0, 1].includes(indexInSlot)) {
-        yOff = baseLength * 0.05;
-      }
-      if ([2, 3].includes(indexInSlot)) {
-        yOff = -0.3 * baseLength * 0.05;
-      }
-      if ([4, 5].includes(indexInSlot)) {
-        yOff = -0.1 * baseLength * 0.5;
-      }
-      return {
-        xOff: (indexInSlot % 2) * (baseLength * 0.05),
-        yOff: yOff,
-      };
+    // 2. Update player location based on die roll (using your existing logic)
+    // Animate the player movement over the slots
+    await animatePlayerMovement(player, newDiceResult);
+    // 3. Enable Next Turn Button
+  };
+
+  const handleNextTurn = () => {
+    const player = game.getCurrentPlayer();
+    player.incrementTurns();
+    if (!player.extraTurn) {
+      // setCurrentPlayer(prevPlayer => (prevPlayer + 1) % game.players.length);
+      game.setNextPlayerAsCurrent();
+    } else {
+      player.endExtraTurn();
+      setExtraTurn(false);
     }
-    if (numPlayers >= 7) {
-      return {
-        xOff: 0,
-        yOff: 0,
-      };
+    setDiceResult(null);
+    setReadyForNextTurn(false);
+  };
+
+  // Function to handle window resize
+  const handleWindowResize = () => {
+    const newBaseLength = Math.min(window.innerHeight, window.innerWidth);
+    const newBaseHeight = window.innerHeight;
+    const newBaseWidth = window.innerWidth;
+    if (
+      newBaseLength !== baseLength && Math.abs(newBaseLength - baseLength) > 2
+    ) {
+      setBaseLength(Math.min(window.innerHeight, window.innerWidth));
+    }
+    if (
+      newBaseHeight !== baseHeight && Math.abs(newBaseHeight - baseHeight) > 2
+    ) {
+      setBaseHeight(window.innerHeight);
+    }
+    // console.log(`new baseWidth: ${newBaseWidth} | old: ${baseWidth}`);
+    if (
+      newBaseWidth !== baseWidth && Math.abs(newBaseWidth - baseWidth) > 2
+    ) {
+      setBaseWidth(window.innerWidth);
     }
   };
 
   useEffect(() => {
-    if (Object.keys(playerPositions).length > 0) {
-      updatePlayerLocations();
-    } else {
-      console.log('Player Positions not ready.');
-    }
+    updatePlayerLocations();
   }, [playerPositions, baseLength]);
 
   // useEffect(() => {
@@ -422,7 +426,7 @@ function GamePage({ game }) {
               Next Turn
             </button>
           )}
-          {!readyForNextTurn && (
+          {!readyForNextTurn && !diceResult && (
             <button onClick={handlePlayerTurn}>Roll Dice</button>
           )}
         </div>
