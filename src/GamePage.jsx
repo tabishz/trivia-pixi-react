@@ -30,11 +30,16 @@ function GamePage({ game }) {
       player.sprite = (
         <Sprite key={player.id} image={icons[player.icon]} anchor={0.5} />
       );
+      const [playerX, playerY] = calculatePositionFromSlotLocation(
+        player.location,
+      );
       playerPos[player.id] = {
         location: player.location,
-        x: player.x,
-        y: player.y,
+        x: playerX,
+        y: playerY,
       };
+      player.x = playerX;
+      player.y = playerY;
     });
     setPlayerPositions(playerPos);
   }, []);
@@ -120,17 +125,6 @@ function GamePage({ game }) {
     const centerCoords = slotCenters(slotCorners[slot]);
     return centerCoords;
   };
-
-  // const handlePlayerMove = (player, moveBy = 1) => {
-  //   setPlayerPositions({
-  //     ...playerPositions,
-  //     [player.id]: {
-  //       ...playerPositions[player.id],
-  //       location: playerPositions[player.id].location + moveBy,
-  //     },
-  //   });
-  //   console.log(`Increasing Player ${player.name} location by +${moveBy}.`);
-  // };
 
   const animatePlayerMovement = (player, moveBy) => {
     setReadyForNextTurn(false); // Disable Next Turn button
@@ -219,6 +213,42 @@ function GamePage({ game }) {
     }
   };
 
+  const updatePlayerLocations = () => {
+    // TODO: use Game functions to update Player Objects
+    // Update icon positions when playerPositions change
+    const playersByLocation = {};
+    game.players.forEach(player => {
+      const newLocation = playerPositions[player.id].location;
+      if (!playersByLocation[newLocation]) {
+        playersByLocation[newLocation] = [];
+      }
+      playersByLocation[newLocation].push(player.id);
+    });
+    game.players.forEach(player => {
+      const newLocation = playerPositions[player.id].location;
+      const playersInSlot = playersByLocation[newLocation]; // Array of players in the slot
+      const numPlayers = playersInSlot.length;
+      let newScale = iconScale;
+      // Adjust position to distribute players evenly in the slot
+      const indexInSlot = playersInSlot.indexOf(player.id);
+      let xOff = 0;
+      let yOff = 0;
+      if (numPlayers > 1) {
+        const offset = calculateIconOffset(indexInSlot, numPlayers);
+        xOff = offset.xOff;
+        yOff = offset.yOff;
+        newScale = newScale * Math.sqrt(numPlayers / 5);
+      }
+      const [xPos, yPos] = calculatePositionFromSlotLocation(newLocation);
+      player.sprite = React.cloneElement(player.sprite, {
+        scale: newScale,
+      });
+      player.location = newLocation;
+      player.x = xPos + xOff;
+      player.y = yPos + yOff;
+    });
+  };
+
   const calculateIconOffset = (indexInSlot, numPlayers) => {
     if (numPlayers == 2) {
       return {
@@ -251,39 +281,11 @@ function GamePage({ game }) {
   };
 
   useEffect(() => {
-    // TODO: use Game functions to update Player Objects
-    // Update icon positions when playerPositions change
-    const playersByLocation = {};
-    game.players.forEach(player => {
-      const newLocation = playerPositions[player.id]?.location || 0;
-      if (!playersByLocation[newLocation]) {
-        playersByLocation[newLocation] = [];
-      }
-      playersByLocation[newLocation].push(player.id);
-    });
-    game.players.forEach(player => {
-      const newLocation = playerPositions[player.id]?.location || 0;
-      const playersInSlot = playersByLocation[newLocation]; // Array of players in the slot
-      const numPlayers = playersInSlot.length;
-      let newScale = iconScale;
-      // Adjust position to distribute players evenly in the slot
-      const indexInSlot = playersInSlot.indexOf(player.id);
-      let xOff = 0;
-      let yOff = 0;
-      if (numPlayers > 1) {
-        const offset = calculateIconOffset(indexInSlot, numPlayers);
-        xOff = offset.xOff;
-        yOff = offset.yOff;
-        newScale = newScale * Math.sqrt(numPlayers / 5);
-      }
-      const [xPos, yPos] = calculatePositionFromSlotLocation(newLocation);
-      player.sprite = React.cloneElement(player.sprite, {
-        scale: newScale,
-      });
-      player.location = newLocation;
-      player.x = xPos + xOff;
-      player.y = yPos + yOff;
-    });
+    if (Object.keys(playerPositions).length > 0) {
+      updatePlayerLocations();
+    } else {
+      console.log('Player Positions not ready.');
+    }
   }, [playerPositions, baseLength]);
 
   // useEffect(() => {
