@@ -6,6 +6,8 @@ import { useNavigate } from 'react-router-dom';
 
 import icons from './components/icons';
 
+const NUM_OF_SLOTS = 28;
+
 function GamePage({ game }) {
   game.startGame();
   const stageRef = useRef(null); // Ref for the PIXI.js Stage
@@ -14,6 +16,10 @@ function GamePage({ game }) {
   // const [currentPlayer, setCurrentPlayer] = useState(0);
   const [readyForNextTurn, setReadyForNextTurn] = useState(false);
   const [diceResult, setDiceResult] = useState(null);
+  const [showGameControls, setShowGameControls] = useState(true);
+  const [showCard, setShowCard] = useState(false);
+  const [showAnswer, setShowAnswer] = useState(false);
+  const [cardData, setCardData] = useState(null);
   const [extraTurn, setExtraTurn] = useState(false);
   const [baseHeight, setBaseHeight] = useState(window.innerHeight);
   const [baseWidth, setBaseWidth] = useState(window.innerWidth);
@@ -43,7 +49,7 @@ function GamePage({ game }) {
    * @returns {Array} [x,y] cordinates for player position on board
    */
   const calculatePositionFromSlotLocation = (location) => {
-    const slot = location % 28; // Number of boxes on board
+    const slot = location % NUM_OF_SLOTS; // Number of boxes on board
     const grid = [
       0,
       35 / 216,
@@ -193,12 +199,6 @@ function GamePage({ game }) {
   };
   const [playerPositions, setPlayerPositions] = useState(initPlayerPositions());
 
-  // Make sure Players are Players Class Objects
-  // useEffect(() => {
-  //   game.players = game.importPlayersData(game.players);
-  //   console.log('Converting Players Array to Player Class Objects');
-  // }, []);
-
   const animatePlayerMovement = async (player, moveBy) => {
     setReadyForNextTurn(false); // Disable Next Turn button
     let currentLocation = playerPositions[player.id].location;
@@ -207,7 +207,6 @@ function GamePage({ game }) {
     await new Promise(resolve => {
       const tl = gsap.timeline({
         onComplete: () => {
-          setReadyForNextTurn(true); // Enable Next Turn button after animation
           resolve();
         },
       });
@@ -235,6 +234,30 @@ function GamePage({ game }) {
     });
   };
 
+  const handleAnswerResult = (isCorrect) => {
+    setShowCard(false);
+  };
+
+  const waitForAnswer = async () => {
+  };
+
+  const handleAnswerClick = () => {
+    setShowAnswer(true); // Show the answer
+  };
+
+  const displayQuestionCard = async (player) => {
+    // TODO: use slot# to get Card Category
+    // const slot = player.location % NUM_OF_SLOTS;
+    setShowGameControls(false);
+    const theQuestion = game.questions[0];
+    const category = theQuestion.category;
+    const question = theQuestion.question;
+    const answer = theQuestion.answer;
+    setCardData({ category: category, question: question, answer: answer });
+    setShowCard(true);
+    const userAnswer = await waitForAnswer();
+  };
+
   const handlePlayerTurn = async () => {
     // TODO: use Game class functions to update players.
     // TODO: add function to store player turn history
@@ -249,7 +272,10 @@ function GamePage({ game }) {
     // 2. Update player location based on die roll (using your existing logic)
     // Animate the player movement over the slots
     await animatePlayerMovement(player, newDiceResult);
-    // 3. Enable Next Turn Button
+    // 3. Get Question Card answered
+    await displayQuestionCard();
+    // 4. Enable Next Turn Button
+    setReadyForNextTurn(true);
   };
 
   const handleNextTurn = () => {
@@ -411,27 +437,59 @@ function GamePage({ game }) {
           </Container>
         </Stage>
       </div>
-      <div className='game-ui'>
-        <div>
-          <p>
-            Current Player: {game.players[game.currentPlayer]?.name}{' '}
-            <img
-              className='mini-icons'
-              src={icons[game.players[game.currentPlayer]?.icon]}
-            />
-          </p>
-          {extraTurn && <p>Extra Turn!</p>}
-          {diceResult && <p>Dice Roll: {diceResult}</p>}
-          {readyForNextTurn && (
-            <button onClick={handleNextTurn}>
-              Next Turn
-            </button>
-          )}
-          {!readyForNextTurn && !diceResult && (
-            <button onClick={handlePlayerTurn}>Roll Dice</button>
-          )}
+      {showGameControls && (
+        <div className='game-ui'>
+          <div className='game-controls-box'>
+            <p>
+              Current Player: {game.players[game.currentPlayer]?.name}{' '}
+              <img
+                className='mini-icons'
+                src={icons[game.players[game.currentPlayer]?.icon]}
+              />
+            </p>
+            {extraTurn && <p>Extra Turn!</p>}
+            {diceResult && <p>Dice Roll: {diceResult}</p>}
+            {readyForNextTurn && (
+              <button onClick={handleNextTurn}>
+                Next Turn
+              </button>
+            )}
+            {!readyForNextTurn && !diceResult && (
+              <button onClick={handlePlayerTurn}>Roll Dice</button>
+            )}
+          </div>
         </div>
-      </div>
+      )}
+      {showCard && cardData && (
+        <div className='card-container'>
+          <div className='card'>
+            <p>{cardData.question}</p>
+            {!showAnswer && (
+              <button id='answer-button' onClick={handleAnswerClick}>
+                Reveal Answer
+              </button>
+            )}
+
+            {showAnswer && (
+              <div>
+                <p className='answer'>{cardData.answer}</p>
+                <button
+                  id='correct-button'
+                  onClick={() => handleAnswerResult(true)}
+                >
+                  &#10003;
+                </button>
+                <button
+                  id='incorrect-button'
+                  onClick={() => handleAnswerResult(false)}
+                >
+                  &#10007;
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
       <div className='bottom'>
         <button onClick={goHome} className='button-retro'>&#127968;</button>
       </div>
