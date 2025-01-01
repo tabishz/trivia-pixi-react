@@ -9,7 +9,7 @@ class Game {
   constructor(gameName = null, sessionId = null) {
     this.players = [];
     this.currentPlayer = 0; // Index of the current player in the players array
-    this.startTime = Date.now();
+    this.startTime = null;
     this.endTime = null;
     this.gameOver = false;
     this.questions = []; // Array to store questions
@@ -32,6 +32,10 @@ class Game {
     return false;
   }
 
+  startGame() {
+    this.startTime = Date.now();
+  }
+
   async playTurn(player) {
     await player.playerToRollDice();
     await player.movePlayerToSlot();
@@ -47,7 +51,7 @@ class Game {
   }
 
   generateSessionId() {
-    const timestamp = this.startTime.toString();
+    const timestamp = Date.now().toString();
     const randomString = Math.random().toString(36).substring(2, 15);
     this.sessionId = timestamp + randomString;
     return this.sessionId;
