@@ -13,6 +13,7 @@ const colors = [
   'ivory',
   'khaki',
   'lime',
+  'keylime',
   'linen',
   'maroon',
   'navy',
@@ -31,6 +32,11 @@ const colors = [
   'violet',
   'white',
   'yellow',
+  'indigo',
+  'saffron',
+  'golden',
+  'mustard',
+  'amber',
 ];
 
 const cuteAnimalNames = [
@@ -45,8 +51,7 @@ const cuteAnimalNames = [
   'penguin',
   'parrot',
   'hummingbird',
-  'kitten',
-  'chipmunk',
+  'rabbit',
   'squirrel',
   'butterfly',
   'dragonfly',
@@ -56,7 +61,7 @@ const cuteAnimalNames = [
   'guppy',
   'hamster',
   'gerbil',
-  'rabbit',
+  'hare',
   'ferret',
   'chinchilla',
 ];
@@ -64,35 +69,46 @@ const cuteAnimalNames = [
 const qualities = [
   'kind',
   'honest',
-  'courage',
-  'humor',
-  'grace',
-  'wit',
-  'charm',
-  'passion',
-  'empathy',
-  'patience',
-  'optimism',
-  'joy',
-  'love',
-  'peace',
-  'serenity',
-  'wisdom',
-  'strength',
-  'resilience',
-  'perseverance',
-  'integrity',
-  'gratitude',
-  'humility',
-  'curiosity',
+  'courageous',
+  'humorous',
+  'gracious',
+  'witty',
+  'charming',
+  'passionate',
+  'empathetic',
+  'patient',
+  'optimistic',
+  'joyful',
+  'loving',
+  'peaceful',
+  'serene',
+  'wise',
+  'strong',
+  'resilient',
+  'awesome',
+  'funny',
+  'grateful',
+  'humble',
+  'curious',
+  'super',
+  'courteous',
+  'smart',
+  'genius',
+  'brave',
+  'quick',
+  'enigmatic',
+  'friendly',
+  'clever',
+  'chill',
+  'calm',
 ];
 
 const createRandomName = () => {
   const randomColor = Math.floor(Math.random() * colors.length);
   const randomAnimal = Math.floor(Math.random() * cuteAnimalNames.length);
   const randomQuality = Math.floor(Math.random() * qualities.length);
-  return (colors[randomColor] + '-' + cuteAnimalNames[randomAnimal] + '-' +
-    qualities[randomQuality]);
+  return (colors[randomColor] + '-' + qualities[randomQuality] + '-' +
+    cuteAnimalNames[randomAnimal]);
 };
 
 export default createRandomName;

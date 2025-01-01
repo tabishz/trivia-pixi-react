@@ -158,7 +158,7 @@ function GameSetupPage({ game }) {
 
         {game.players.length > 1 && (
           <button className='button-retro' onClick={startGame}>
-            Start Game!
+            {game.startTime ? 'Resume Game!' : 'Start Game!'}
           </button>
         )}
       </div>

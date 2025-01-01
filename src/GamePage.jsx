@@ -7,11 +7,11 @@ import { useNavigate } from 'react-router-dom';
 import icons from './components/icons';
 
 function GamePage({ game }) {
+  game.startGame();
   const stageRef = useRef(null); // Ref for the PIXI.js Stage
   const [iconScale, setIconScale] = useState(0.1);
   // const [players, setPlayers] = useState(game.players);
-  const [playerPositions, setPlayerPositions] = useState({});
-  const [currentPlayer, setCurrentPlayer] = useState(0);
+  // const [currentPlayer, setCurrentPlayer] = useState(0);
   const [readyForNextTurn, setReadyForNextTurn] = useState(false);
   const [diceResult, setDiceResult] = useState(null);
   const [extraTurn, setExtraTurn] = useState(false);
@@ -22,28 +22,6 @@ function GamePage({ game }) {
   );
   // const { sessionId } = useParams();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    // Initialize players with sprites and positions
-    const playerPos = {};
-    game.players.forEach(player => {
-      player.sprite = (
-        <Sprite key={player.id} image={icons[player.icon]} anchor={0.5} />
-      );
-      playerPos[player.id] = {
-        location: player.location,
-        x: player.x,
-        y: player.y,
-      };
-    });
-    setPlayerPositions(playerPos);
-  }, []);
-
-  // Make sure Players are Players Class Objects
-  // useEffect(() => {
-  //   game.players = game.importPlayersData(game.players);
-  //   console.log('Converting Players Array to Player Class Objects');
-  // }, []);
 
   /**
    * Returns the center coordinate for given rectable with corners coordinates
@@ -121,101 +99,6 @@ function GamePage({ game }) {
     return centerCoords;
   };
 
-  // const handlePlayerMove = (player, moveBy = 1) => {
-  //   setPlayerPositions({
-  //     ...playerPositions,
-  //     [player.id]: {
-  //       ...playerPositions[player.id],
-  //       location: playerPositions[player.id].location + moveBy,
-  //     },
-  //   });
-  //   console.log(`Increasing Player ${player.name} location by +${moveBy}.`);
-  // };
-
-  const animatePlayerMovement = (player, moveBy) => {
-    setReadyForNextTurn(false); // Disable Next Turn button
-
-    let currentLocation = playerPositions[player.id].location;
-
-    // GSAP timeline for the animation
-    const tl = gsap.timeline({
-      onComplete: () => {
-        setReadyForNextTurn(true); // Enable Next Turn button after animation
-      },
-    });
-
-    for (let i = 1; i <= moveBy; i++) {
-      const newLocation = currentLocation + i;
-      const [xPos, yPos] = calculatePositionFromSlotLocation(newLocation);
-
-      tl.to(player, {
-        duration: 0.2, // 200ms per slot
-        x: xPos,
-        y: yPos,
-        onUpdate: () => {
-          // Update playerPositions state during the animation
-          setPlayerPositions(prevPositions => ({
-            ...prevPositions,
-            [player.id]: { ...prevPositions[player.id], location: newLocation },
-          }));
-        },
-      });
-    }
-  };
-
-  const handlePlayerTurn = () => {
-    // TODO: use Game class functions to update players.
-    const player = game.players[currentPlayer];
-    // 1. Roll the die (generate a random number between 1 and 6)
-    const newDiceResult = Math.floor(Math.random() * 6) + 1;
-    setDiceResult(newDiceResult);
-    if (newDiceResult === 6) {
-      setExtraTurn(true);
-      player.giveExtraTurn();
-    }
-    // 2. Update player location based on die roll (using your existing logic)
-    // handlePlayerMove(players[currentPlayer], newDiceResult);
-    // Animate the player movement over the slots
-    animatePlayerMovement(player, newDiceResult);
-    // 3. Enable Next Turn Button
-    setReadyForNextTurn(true);
-  };
-
-  const handleNextTurn = () => {
-    const player = game.players[currentPlayer];
-    if (!player.extraTurn) {
-      setCurrentPlayer(prevPlayer => (prevPlayer + 1) % game.players.length);
-    } else {
-      player.endExtraTurn();
-      setExtraTurn(false);
-    }
-    setDiceResult(null);
-    setReadyForNextTurn(false);
-  };
-
-  // Function to handle window resize
-  const handleWindowResize = () => {
-    const newBaseLength = Math.min(window.innerHeight, window.innerWidth);
-    const newBaseHeight = window.innerHeight;
-    const newBaseWidth = window.innerWidth;
-    if (
-      newBaseLength !== baseLength && Math.abs(newBaseLength - baseLength) > 2
-    ) {
-      setBaseLength(Math.min(window.innerHeight, window.innerWidth));
-    }
-    if (
-      newBaseHeight !== baseHeight && Math.abs(newBaseHeight - baseHeight) > 2
-    ) {
-      setBaseHeight(window.innerHeight);
-    }
-    // console.log(`new baseWidth: ${newBaseWidth} | old: ${baseWidth}`);
-    if (
-      newBaseWidth !== baseWidth && Math.abs(newBaseWidth - baseWidth) > 2
-    ) {
-      setBaseWidth(window.innerWidth);
-    }
-  };
-
   const calculateIconOffset = (indexInSlot, numPlayers) => {
     if (numPlayers == 2) {
       return {
@@ -247,19 +130,19 @@ function GamePage({ game }) {
     }
   };
 
-  useEffect(() => {
+  const updatePlayerLocations = () => {
     // TODO: use Game functions to update Player Objects
     // Update icon positions when playerPositions change
     const playersByLocation = {};
     game.players.forEach(player => {
-      const newLocation = playerPositions[player.id]?.location || 0;
+      const newLocation = playerPositions[player.id].location;
       if (!playersByLocation[newLocation]) {
         playersByLocation[newLocation] = [];
       }
       playersByLocation[newLocation].push(player.id);
     });
     game.players.forEach(player => {
-      const newLocation = playerPositions[player.id]?.location || 0;
+      const newLocation = playerPositions[player.id].location;
       const playersInSlot = playersByLocation[newLocation]; // Array of players in the slot
       const numPlayers = playersInSlot.length;
       let newScale = iconScale;
@@ -281,6 +164,133 @@ function GamePage({ game }) {
       player.x = xPos + xOff;
       player.y = yPos + yOff;
     });
+  };
+
+  const initPlayerPositions = () => {
+    // Initialize players with sprites and positions
+    const playerPos = {};
+    game.players.forEach(player => {
+      player.sprite = (
+        <Sprite
+          key={player.id}
+          image={icons[player.icon]}
+          anchor={0.5}
+          scale={iconScale}
+        />
+      );
+      const [playerX, playerY] = calculatePositionFromSlotLocation(
+        player.location,
+      );
+      playerPos[player.id] = {
+        location: player.location,
+        x: playerX,
+        y: playerY,
+      };
+      // player.x = playerX;
+      // player.y = playerY;
+    });
+    return playerPos;
+  };
+  const [playerPositions, setPlayerPositions] = useState(initPlayerPositions());
+
+  // Make sure Players are Players Class Objects
+  // useEffect(() => {
+  //   game.players = game.importPlayersData(game.players);
+  //   console.log('Converting Players Array to Player Class Objects');
+  // }, []);
+
+  const animatePlayerMovement = async (player, moveBy) => {
+    setReadyForNextTurn(false); // Disable Next Turn button
+    let currentLocation = playerPositions[player.id].location;
+
+    // GSAP timeline for the animation
+    await new Promise(resolve => {
+      const tl = gsap.timeline({
+        onComplete: () => {
+          setReadyForNextTurn(true); // Enable Next Turn button after animation
+          resolve();
+        },
+      });
+
+      for (let i = 1; i <= moveBy; i++) {
+        const newLocation = currentLocation + i;
+        const [xPos, yPos] = calculatePositionFromSlotLocation(newLocation);
+
+        tl.to(player, {
+          duration: 0.2, // 200ms per slot
+          x: xPos,
+          y: yPos,
+          onUpdate: () => {
+            // Update playerPositions state during the animation
+            setPlayerPositions(prevPositions => ({
+              ...prevPositions,
+              [player.id]: {
+                ...prevPositions[player.id],
+                location: newLocation,
+              },
+            }));
+          },
+        });
+      }
+    });
+  };
+
+  const handlePlayerTurn = async () => {
+    // TODO: use Game class functions to update players.
+    // TODO: add function to store player turn history
+    const player = game.getCurrentPlayer();
+    // 1. Roll the die (generate a random number between 1 and 6)
+    const newDiceResult = Math.floor(Math.random() * 6) + 1;
+    setDiceResult(newDiceResult);
+    if (newDiceResult === 6) {
+      setExtraTurn(true);
+      player.giveExtraTurn();
+    }
+    // 2. Update player location based on die roll (using your existing logic)
+    // Animate the player movement over the slots
+    await animatePlayerMovement(player, newDiceResult);
+    // 3. Enable Next Turn Button
+  };
+
+  const handleNextTurn = () => {
+    const player = game.getCurrentPlayer();
+    player.incrementTurns();
+    if (!player.extraTurn) {
+      // setCurrentPlayer(prevPlayer => (prevPlayer + 1) % game.players.length);
+      game.setNextPlayerAsCurrent();
+    } else {
+      player.endExtraTurn();
+      setExtraTurn(false);
+    }
+    setDiceResult(null);
+    setReadyForNextTurn(false);
+  };
+
+  // Function to handle window resize
+  const handleWindowResize = () => {
+    const newBaseLength = Math.min(window.innerHeight, window.innerWidth);
+    const newBaseHeight = window.innerHeight;
+    const newBaseWidth = window.innerWidth;
+    if (
+      newBaseLength !== baseLength && Math.abs(newBaseLength - baseLength) > 2
+    ) {
+      setBaseLength(Math.min(window.innerHeight, window.innerWidth));
+    }
+    if (
+      newBaseHeight !== baseHeight && Math.abs(newBaseHeight - baseHeight) > 2
+    ) {
+      setBaseHeight(window.innerHeight);
+    }
+    // console.log(`new baseWidth: ${newBaseWidth} | old: ${baseWidth}`);
+    if (
+      newBaseWidth !== baseWidth && Math.abs(newBaseWidth - baseWidth) > 2
+    ) {
+      setBaseWidth(window.innerWidth);
+    }
+  };
+
+  useEffect(() => {
+    updatePlayerLocations();
   }, [playerPositions, baseLength]);
 
   // useEffect(() => {
@@ -404,10 +414,10 @@ function GamePage({ game }) {
       <div className='game-ui'>
         <div>
           <p>
-            Current Player: {game.players[currentPlayer]?.name}{' '}
+            Current Player: {game.players[game.currentPlayer]?.name}{' '}
             <img
               className='mini-icons'
-              src={icons[game.players[currentPlayer]?.icon]}
+              src={icons[game.players[game.currentPlayer]?.icon]}
             />
           </p>
           {extraTurn && <p>Extra Turn!</p>}
@@ -417,7 +427,7 @@ function GamePage({ game }) {
               Next Turn
             </button>
           )}
-          {!readyForNextTurn && (
+          {!readyForNextTurn && !diceResult && (
             <button onClick={handlePlayerTurn}>Roll Dice</button>
           )}
         </div>
