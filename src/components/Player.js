@@ -2,7 +2,7 @@ import { v7 as uuidv7 } from 'uuid';
 
 class Player {
   constructor(name, id = null) {
-    this.setName(name);
+    this.name = this.filterName(name);
     this.id = id || this._generatePlayerId();
     this.icon = null;
     this.sprite = null;
@@ -31,11 +31,18 @@ class Player {
     return this.id;
   }
 
-  setName(name) {
+  filterName(name) {
     if (typeof name !== 'string') { return false; }
-    let newName = name;
-    if (name.length > 16) { newName = name.slice(0, 16); }
-    this.name = newName;
+    let filteredName = '';
+    if (filteredName.length > 16) {
+      filteredName = filteredName.slice(0, 16);
+    }
+    filteredName = name.replace(/[^a-zA-Z0-9\s\-_']/g, ''); // Remove invalid characters
+    return filteredName;
+  }
+
+  setName(name) {
+    this.name = this.filterName(name);
   }
 
   setIcon(iconName) {
