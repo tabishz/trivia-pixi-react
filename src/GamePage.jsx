@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import icons from './components/icons';
 
 function GamePage({ game }) {
+  game.startGame();
   const stageRef = useRef(null); // Ref for the PIXI.js Stage
   const [iconScale, setIconScale] = useState(0.1);
   // const [players, setPlayers] = useState(game.players);
