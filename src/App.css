@@ -344,9 +344,48 @@ img.mini-icons {
 
 /* Question Card */
 .card-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   background-color: transparent;
-  width: 300px;
-  height: 200px;
-  border: 1px solid #f1f1f1;
-  perspective: 1000px;
+  min-width: 16vw;
+  max-width: 400px;
+  min-height: 20vh;
+  max-height: 35vw;
+  padding: 1vh;
+  border: 0.5vh solid #015922;
+  border-radius: 3vh;
+  box-shadow: 5px 5px 0px 0px rgba(0, 52, 0, 0.5);
+  z-index: 9;
+}
+
+.card {
+  position: relative;
+  text-align: center;
+}
+
+#answer-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  text-decoration: none;
+  color: #333333;
+  font-size: 18px;
+  border-radius: 0px;
+  width: 80%;
+  height: 3vh;
+  font-weight: bold;
+  border: 2px solid #333333;
+  transition: 0.3s;
+  margin: auto;
+  box-shadow: 5px 5px 0px 0px rgba(51, 51, 51, 1);
+  background-color: #ffffff;
+}
+
+#answer-button:hover {
+  box-shadow: 0 0 #333;
+  color: #fff;
+  background-color: #333;
 }
