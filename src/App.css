@@ -320,8 +320,18 @@ li.gameSessions:hover {
   z-index: 10;
 }
 
+.score-matrix table {
+  border-collapse: collapse;
+}
+
 .score-matrix td {
   text-align: center;
+  border-style: none;
+}
+
+tr.current-player {
+  background-color: #d5e4ea;
+  clip-path: xywh(0 0 100% 100% round 0.5vh);
 }
 
 img.mini-icons {

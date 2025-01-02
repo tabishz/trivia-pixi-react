@@ -419,7 +419,11 @@ function GamePage({ game }) {
           </thead>
           <tbody>
             {game.players.map(player => (
-              <tr key={player.id}>
+              <tr
+                key={player.id}
+                className={(player.id === game.getCurrentPlayer().id) &&
+                  'current-player'}
+              >
                 <td>{player.name}</td>
                 <td>
                   <img className='mini-icons' src={icons[player.icon]} />
