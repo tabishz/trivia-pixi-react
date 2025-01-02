@@ -14,13 +14,17 @@ function GamePage({ game }) {
   const [iconScale, setIconScale] = useState(0.1);
   // const [players, setPlayers] = useState(game.players);
   // const [currentPlayer, setCurrentPlayer] = useState(0);
-  const [readyForNextTurn, setReadyForNextTurn] = useState(false);
+  const [readyForNextTurn, setReadyForNextTurn] = useState(
+    game.readyForNextTurn,
+  );
   const [diceResult, setDiceResult] = useState(null);
-  const [showGameControls, setShowGameControls] = useState(true);
-  const [showCard, setShowCard] = useState(false);
-  const [showAnswer, setShowAnswer] = useState(false);
-  const [cardData, setCardData] = useState(null);
-  const [extraTurn, setExtraTurn] = useState(false);
+  const [showGameControls, setShowGameControls] = useState(
+    game.showGameControls,
+  );
+  const [showCard, setShowCard] = useState(game.showCard);
+  const [showAnswer, setShowAnswer] = useState(game.showAnswer);
+  const [cardData, setCardData] = useState(game.cardData);
+  const [extraTurn, setExtraTurn] = useState(game.extraTurn);
   const [baseHeight, setBaseHeight] = useState(window.innerHeight);
   const [baseWidth, setBaseWidth] = useState(window.innerWidth);
   const [baseLength, setBaseLength] = useState(
@@ -201,6 +205,7 @@ function GamePage({ game }) {
 
   const animatePlayerMovement = async (player, moveBy) => {
     setReadyForNextTurn(false); // Disable Next Turn button
+    game.readyForNextTurn = false;
     let currentLocation = playerPositions[player.id].location;
 
     // GSAP timeline for the animation
@@ -235,27 +240,42 @@ function GamePage({ game }) {
   };
 
   const handleAnswerResult = (isCorrect) => {
+    game.question.respond(isCorrect);
+    if (isCorrect) {
+      game.players[game.currentPlayer].incrementScore();
+    }
+    game.question.setAnsweredBy(game.players[game.currentPlayer].id);
+    game.answerQuestion();
+    game.clearQuestion();
+    setShowAnswer(false);
+    game.showAnswer = false;
     setShowCard(false);
-  };
-
-  const waitForAnswer = async () => {
+    game.showCard = false;
+    setCardData(null);
+    game.cardData = null;
+    setShowGameControls(true);
+    game.showGameControls = true;
   };
 
   const handleAnswerClick = () => {
     setShowAnswer(true); // Show the answer
   };
 
-  const displayQuestionCard = async (player) => {
+  const displayQuestionCard = (player) => {
     // TODO: use slot# to get Card Category
-    // const slot = player.location % NUM_OF_SLOTS;
+    const slot = player.location % NUM_OF_SLOTS;
+    console.log('Slot:', slot);
     setShowGameControls(false);
-    const theQuestion = game.questions[0];
-    const category = theQuestion.category;
-    const question = theQuestion.question;
-    const answer = theQuestion.answer;
-    setCardData({ category: category, question: question, answer: answer });
+    game.showGameControls = false;
+    game.question = game.questions[0];
+    const category = game.question.category;
+    const question = game.question.question;
+    const answer = game.question.answer;
+    const cData = { category: category, question: question, answer: answer };
+    setCardData(cData);
+    game.cardData = cData;
     setShowCard(true);
-    const userAnswer = await waitForAnswer();
+    game.showCard = true;
   };
 
   const handlePlayerTurn = async () => {
@@ -273,9 +293,10 @@ function GamePage({ game }) {
     // Animate the player movement over the slots
     await animatePlayerMovement(player, newDiceResult);
     // 3. Get Question Card answered
-    await displayQuestionCard();
+    await displayQuestionCard(player);
     // 4. Enable Next Turn Button
     setReadyForNextTurn(true);
+    game.readyForNextTurn = true;
   };
 
   const handleNextTurn = () => {
@@ -290,6 +311,7 @@ function GamePage({ game }) {
     }
     setDiceResult(null);
     setReadyForNextTurn(false);
+    game.readyForNextTurn = false;
   };
 
   // Function to handle window resize
@@ -463,6 +485,10 @@ function GamePage({ game }) {
       {showCard && cardData && (
         <div className='card-container'>
           <div className='card'>
+            <p>
+              Question for{' '}
+              <strong>{game.players[game.currentPlayer].name}</strong>
+            </p>
             <p>{cardData.question}</p>
             {!showAnswer && (
               <button id='answer-button' onClick={handleAnswerClick}>
