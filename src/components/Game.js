@@ -49,7 +49,8 @@ class Game {
     qs.push(
       new Question({
         category: 'Quran',
-        question: 'What is Quran?',
+        question:
+          'What is Quran? As this is a sample question; here is some filler text.',
         answer:
           'A Holy Book revealed to Prophet Muhammad (peace be upon him and his holy progeny).',
       }),

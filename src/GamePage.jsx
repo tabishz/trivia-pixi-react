@@ -421,8 +421,9 @@ function GamePage({ game }) {
             {game.players.map(player => (
               <tr
                 key={player.id}
-                className={(player.id === game.getCurrentPlayer().id) &&
-                  'current-player'}
+                className={(player.id === game.getCurrentPlayer().id)
+                  ? 'current-player'
+                  : ''}
               >
                 <td>{player.name}</td>
                 <td>
@@ -467,7 +468,7 @@ function GamePage({ game }) {
         <div className='game-ui'>
           <div className='game-controls-box'>
             <p>
-              Current Player: {game.players[game.currentPlayer]?.name}{' '}
+              Player: <strong>{game.players[game.currentPlayer]?.name}</strong>
               <img
                 className='mini-icons'
                 src={icons[game.players[game.currentPlayer]?.icon]}
@@ -476,47 +477,63 @@ function GamePage({ game }) {
             {extraTurn && <p>Extra Turn!</p>}
             {diceResult && <p>Dice Roll: {diceResult}</p>}
             {readyForNextTurn && (
-              <button onClick={handleNextTurn}>
+              <button className='game-btn-1' onClick={handleNextTurn}>
                 Next Turn
               </button>
             )}
             {!readyForNextTurn && !diceResult && (
-              <button onClick={handlePlayerTurn}>Roll Dice</button>
+              <button className='game-btn-1' onClick={handlePlayerTurn}>
+                Roll Dice
+              </button>
             )}
           </div>
         </div>
       )}
       {showCard && cardData && (
         <div className='card-container'>
-          <div className='card'>
-            <p>
-              Question for{' '}
-              <strong>{game.players[game.currentPlayer].name}</strong>
-            </p>
-            <p>{cardData.question}</p>
-            {!showAnswer && (
-              <button id='answer-button' onClick={handleAnswerClick}>
-                Reveal Answer
-              </button>
-            )}
+          <div className='wrapper'>
+            <div className='card'>
+              <question>
+                {cardData.question}
+              </question>
+              {!showAnswer && (
+                <button className='game-btn-1' onClick={handleAnswerClick}>
+                  Reveal Answer
+                </button>
+              )}
+              <hr />
+              {showAnswer && (
+                <div>
+                  <answer>{cardData.answer}</answer>
 
-            {showAnswer && (
-              <div>
-                <p className='answer'>{cardData.answer}</p>
-                <button
-                  id='correct-button'
-                  onClick={() => handleAnswerResult(true)}
-                >
-                  &#10003;
-                </button>
-                <button
-                  id='incorrect-button'
-                  onClick={() => handleAnswerResult(false)}
-                >
-                  &#10007;
-                </button>
+                  <ul className='card-button'>
+                    <li className='card-button'>
+                      <a
+                        className='card-button card-button-correct'
+                        href='#'
+                        onClick={() => handleAnswerResult(true)}
+                      >
+                        &#10003;
+                      </a>
+                    </li>
+                    <li className='card-button'>
+                      <a
+                        className='card-button card-button-wrong'
+                        href='#'
+                        onClick={() => handleAnswerResult(false)}
+                      >
+                        &#10008;
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              )}
+              <div className='category'>
+                <p>
+                  Category | <strong>{cardData.category}</strong>
+                </p>
               </div>
-            )}
+            </div>
           </div>
         </div>
       )}

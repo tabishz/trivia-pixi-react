@@ -11,6 +11,11 @@
   src: url('./fonts/Ultra-Regular.ttf') format('truetype');
 }
 
+@font-face {
+  font-family: 'MedulaOne';
+  src: url('./fonts/MedulaOne-Regular.ttf') format('truetype');
+}
+
 .App {
   text-align: center;
   position: relative;
@@ -352,37 +357,95 @@ img.mini-icons {
   z-index: 10;
 }
 
+.game-controls-box {
+  justify-content: center;
+}
+
 /* Question Card */
 .card-container {
   position: fixed;
-  top: 50%;
+  top: 40%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-color: transparent;
-  min-width: 16vw;
-  max-width: 400px;
-  min-height: 20vh;
-  max-height: 35vw;
-  padding: 1vh;
-  border: 0.5vh solid #015922;
-  border-radius: 3vh;
-  box-shadow: 5px 5px 0px 0px rgba(0, 52, 0, 0.5);
-  z-index: 9;
+  user-select:none;
+  max-width: 360px;
+  width: 20vw;
+  max-height: 600px;
+  min-height: 30vh;
+  margin: 5rem auto;
+  box-shadow: 0 7px 20px 5px #00000088;
+  border-radius: 2em;
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+  overflow: hidden;
+  transition: .5s all;
+  hr{
+    width: 100%;
+    border: none;
+    border-bottom: 1px solid #88888855;
+    margin-top: 1vh;
+  }
+  .wrapper {
+    background: linear-gradient(to bottom right, rgb(4, 187, 228), rgb(5, 92, 100));
+    border-radius: 2em;
+    padding: 0.5em; /* Adjust for border thickness */
+  }
+  .card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border: 5px solid transparent;
+    background-color: white;
+    border-radius: 1.6em;
+    min-height: 30vh;
+    padding: 1rem;
+    question {
+      font-family: MedulaOne;
+      font-size: 2em;
+      padding: 2vh 0.5vh;
+    }
+    answer {
+      font-family: MedulaOne;
+      font-size: 1.4em;
+    }
+    .category {
+      display: flex;
+      justify-content: center;
+      font-size: 0.9em;
+      margin-top: auto;
+    }
+  }
+  ::before{
+    position: fixed;
+    content: "";
+    box-shadow: 0 0 100px 40px #3a3a3a08;
+    top: -10%;
+    left: -100%;
+    transform: rotate(-45deg);
+    height: 60rem;
+    transition: .7s all;
+  }
+  &:hover{
+    border: 1px solid #ffffff44;
+    box-shadow: 0 7px 50px 10px #000000aa;
+    transform: translate(-50%, -50%) scale(1.015);
+    filter: brightness(1.3);
+    ::before{
+      filter: brightness(.5);
+      top: -100%;
+      left: 200%;
+    }
+  }
 }
 
-.card {
-  position: relative;
-  text-align: center;
-}
-
-#answer-button {
+.game-btn-1 {
   display: flex;
   align-items: center;
   justify-content: center;
   line-height: 1;
   text-decoration: none;
   color: #333333;
-  font-size: 18px;
+  font-size: 1.2em;
   border-radius: 0px;
   width: 80%;
   height: 3vh;
@@ -392,10 +455,46 @@ img.mini-icons {
   margin: auto;
   box-shadow: 5px 5px 0px 0px rgba(51, 51, 51, 1);
   background-color: #ffffff;
+  &:hover {
+    box-shadow: 0 0 #333;
+    color: #fff;
+    background-color: #333;
+  }
 }
 
-#answer-button:hover {
-  box-shadow: 0 0 #333;
-  color: #fff;
-  background-color: #333;
+/* Button Styles for Right and Wrong buttons */
+ul.card-button {
+  margin:2vh 0 0 0;
+  padding:0;
+  justify-content: center;
+  display:flex;
+  list-style:none;
+}
+
+ul.card-button li.card-button a.card-button {
+  position: relative;
+  display: block;
+  margin: 0 2vh;
+  text-decoration: none;
+  width: 2em;
+  height: 2em;
+  text-align: center;
+  line-height: 2em;
+  border-radius: 50%;
+  font-size: 30px;
+  color: white;
+  transition: .8s;
+}
+
+.card-button-correct {
+  background: rgb(0, 87, 0);
+}
+
+.card-button-wrong {
+  background: rgb(113, 0, 0);
+}
+
+a.card-button:hover {
+  transform: scale(1.3);
+  opacity: 0.8;
 }
