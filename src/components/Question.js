@@ -3,22 +3,22 @@ class Question {
     this.category = category;
     this.question = question;
     this.answer = answer;
+    this.answeredBy = null;
     this.responded = false;
     this.responseCorrect = null;
   }
 
-  respond() {
+  respond(isCorrect = null) {
     this.responded = true;
+    this.responseCorrect = isCorrect;
   }
 
-  correct() {
-    this.respond();
-    this.responseCorrect = true;
-  }
-
-  wrong() {
-    this.respond();
-    this.responseCorrect = false;
+  /**
+   * Assigns user's User ID to question
+   * @param {String} playerId UUID of player who answered the questions
+   */
+  setAnsweredBy(playerId) {
+    this.answeredBy = playerId;
   }
 }
 
