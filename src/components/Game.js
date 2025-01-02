@@ -13,6 +13,13 @@ class Game {
     this.startTime = null;
     this.endTime = null;
     this.gameOver = false;
+    this.question = null;
+    this.readyForNextTurn = false;
+    this.showGameControls = true;
+    this.showCard = false;
+    this.showAnswer = false;
+    this.cardData = null;
+    this.extraTurn = false;
     this.questions = this.loadSampleQuestions(); // TODO: change later
     this.attemptedQuestions = []; // Questions that have been played in session
     this.currentQuestion = null; // To hold the currently active question
@@ -172,6 +179,14 @@ class Game {
     this.currentQuestion = this.getNextQuestion();
     const nextPlayer = this.players[this.currentPlayer];
     return nextPlayer;
+  }
+
+  answerQuestion(question = this.question) {
+    this.attemptedQuestions.push(question);
+  }
+
+  clearQuestion() {
+    this.question = null;
   }
 
   /**
