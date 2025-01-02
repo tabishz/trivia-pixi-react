@@ -2,6 +2,7 @@ import axios from 'axios';
 import createRandomName from './gameNames.js';
 import icons from './icons.js';
 import Player from './Player.js';
+import Question from './Question.js';
 
 const QUESTIONS_API_URL = '';
 
@@ -12,7 +13,14 @@ class Game {
     this.startTime = null;
     this.endTime = null;
     this.gameOver = false;
-    this.questions = []; // Array to store questions
+    this.question = null;
+    this.readyForNextTurn = false;
+    this.showGameControls = true;
+    this.showCard = false;
+    this.showAnswer = false;
+    this.cardData = null;
+    this.extraTurn = false;
+    this.questions = this.loadSampleQuestions(); // TODO: change later
     this.attemptedQuestions = []; // Questions that have been played in session
     this.currentQuestion = null; // To hold the currently active question
     this.sessionId = sessionId || this.generateSessionId();
@@ -34,6 +42,19 @@ class Game {
 
   startGame() {
     this.startTime = Date.now();
+  }
+
+  loadSampleQuestions() {
+    const qs = [];
+    qs.push(
+      new Question({
+        category: 'Quran',
+        question: 'What is Quran?',
+        answer:
+          'A Holy Book revealed to Prophet Muhammad (peace be upon him and his holy progeny).',
+      }),
+    );
+    return qs;
   }
 
   async playTurn(player) {
@@ -158,6 +179,14 @@ class Game {
     this.currentQuestion = this.getNextQuestion();
     const nextPlayer = this.players[this.currentPlayer];
     return nextPlayer;
+  }
+
+  answerQuestion(question = this.question) {
+    this.attemptedQuestions.push(question);
+  }
+
+  clearQuestion() {
+    this.question = null;
   }
 
   /**
