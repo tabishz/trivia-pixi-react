@@ -1,11 +1,20 @@
 class Question {
-  constructor({ category = null, question = null, answer = null } = {}) {
+  constructor(
+    {
+      category = null,
+      question = null,
+      answer = null,
+      answeredBy = null,
+      responded = false,
+      responseCorrect = null,
+    } = {},
+  ) {
     this.category = category;
     this.question = question;
     this.answer = answer;
-    this.answeredBy = null;
-    this.responded = false;
-    this.responseCorrect = null;
+    this.answeredBy = answeredBy;
+    this.responded = responded;
+    this.responseCorrect = responseCorrect;
   }
 
   respond(isCorrect = null) {

@@ -219,7 +219,6 @@ class Game {
     }
     // Get the last question in the Questions list (list already randomized)
     const question = this.questions.pop();
-    this.attemptedQuestions.push(question);
     return question;
   }
 
@@ -279,6 +278,19 @@ class Game {
     });
   }
 
+  importQuestionsData(questionsData) {
+    return questionsData.map(question => {
+      const newQuestion = new Question({
+        question: question.question,
+        category: question.category,
+        answer: question.answer,
+        answeredBy: question.answeredBy,
+        responseCorrect: question.responseCorrect,
+      });
+      return newQuestion;
+    });
+  }
+
   saveGameData() {
     const gameData = {
       players: this.exportPlayersData(),
@@ -288,6 +300,13 @@ class Game {
       gameOver: this.gameOver,
       questions: this.questions,
       attemptedQuestions: this.attemptedQuestions,
+      showGameControls: this.showGameControls,
+      showCard: this.showCard,
+      showAnswer: this.showAnswer,
+      cardData: this.cardData,
+      extraTurn: this.extraTurn,
+      question: this.question,
+      readyForNextTurn: this.readyForNextTurn,
       sessionId: this.sessionId,
       chosenIcons: this.chosenIcons,
       name: this.name,
@@ -299,13 +318,22 @@ class Game {
     if (!gameData) {
       return;
     }
-    this.players = this.importPlayersData(gameData);
+    this.players = this.importPlayersData(gameData.players);
     this.currentPlayer = gameData.currentPlayer;
     this.startTime = gameData.startTime;
     this.endTime = gameData.endTime;
     this.gameOver = gameData.gameOver;
-    this.questions = gameData.questions;
-    this.attemptedQuestions = gameData.attemptedQuestions;
+    this.questions = this.importQuestionsData(gameData.questions);
+    this.question = this.importPlayersData([gameData.question]);
+    this.attemptedQuestions = this.importQuestionsData(
+      gameData.attemptedQuestions,
+    );
+    this.readyForNextTurn = gameData.readyForNextTurn;
+    this.showGameControls = gameData.showGameControls;
+    this.showCard = gameData.showCard;
+    this.showAnswer = gameData.showAnswer;
+    this.cardData = gameData.cardData;
+    this.extraTurn = gameData.extraTurn;
     this.sessionId = gameData.sessionId;
     this.chosenIcons = gameData.chosenIcons;
     this.name = gameData.name;
