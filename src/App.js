@@ -66,7 +66,7 @@ function HomePage({ setGame, setGameSessions, gameSessions }) {
     <div className='App'>
       <div className='title'>
         <h1>
-          Q. <span id='challenge'>Challenge</span>
+          Thaqlain <span id='challenge'>Challenge</span>
         </h1>
       </div>
       <div className='main'>

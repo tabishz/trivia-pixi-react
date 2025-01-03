@@ -267,7 +267,7 @@ function GamePage({ game }) {
     console.log('Slot:', slot);
     setShowGameControls(false);
     game.showGameControls = false;
-    game.question = game.questions[0];
+    game.question = game.getNextQuestion();
     const category = game.question.category;
     const question = game.question.question;
     const answer = game.question.answer;
@@ -393,7 +393,7 @@ function GamePage({ game }) {
   };
 
   const handleKeyDown = (event) => {
-    if (event.key === ' ' && readyForNextTurn) {
+    if ((event.key === ' ' || event.key === 'n') && readyForNextTurn) {
       console.log(`[SPACEBAR] pressed. Next Turn? ${readyForNextTurn}`);
       if (readyForNextTurn) {
         handleNextTurn();

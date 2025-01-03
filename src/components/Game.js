@@ -3,6 +3,7 @@ import createRandomName from './gameNames.js';
 import icons from './icons.js';
 import Player from './Player.js';
 import Question from './Question.js';
+import questionsData from './questionsList.js';
 
 const QUESTIONS_API_URL = '';
 
@@ -45,17 +46,22 @@ class Game {
   }
 
   loadSampleQuestions() {
-    const qs = [];
-    qs.push(
-      new Question({
-        category: 'Quran',
-        question:
-          'What is Quran? As this is a sample question; here is some filler text.',
-        answer:
-          'A Holy Book revealed to Prophet Muhammad (peace be upon him and his holy progeny).',
-      }),
-    );
-    return qs;
+    const questionsShuffled = this.shuffleArray(questionsData);
+    return questionsShuffled.map(q => {
+      return new Question({
+        category: q.category,
+        question: q.question,
+        answer: q.answer,
+      });
+    });
+  }
+
+  shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
   }
 
   async playTurn(player) {
