@@ -319,7 +319,7 @@ li.gameSessions:hover {
   right: 2vh;
   background-color: white;
   padding: 1vh;
-  font-size: 2vh;
+  font-size: 2em;
   border-radius: 1vh;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   z-index: 10;
@@ -450,6 +450,7 @@ img.mini-icons {
   color: #333333;
   font-size: 1.2em;
   border-radius: 0px;
+  padding: 2vh;
   width: 80%;
   height: 3vh;
   font-weight: bold;

@@ -8,7 +8,7 @@ import questionsData from './questionsList.js';
 const QUESTIONS_API_URL = '';
 
 class Game {
-  constructor(gameName = null, sessionId = null) {
+  constructor({ gameName = null, sessionId = null, createdBy = null } = {}) {
     this.players = [];
     this.currentPlayer = 0; // Index of the current player in the players array
     this.startTime = null;
@@ -25,6 +25,7 @@ class Game {
     this.attemptedQuestions = []; // Questions that have been played in session
     this.currentQuestion = null; // To hold the currently active question
     this.sessionId = sessionId || this.generateSessionId();
+    this.createdBy = createdBy;
     this.chosenIcons = [];
     this.name = gameName || createRandomName();
   }
@@ -309,6 +310,7 @@ class Game {
       readyForNextTurn: this.readyForNextTurn,
       sessionId: this.sessionId,
       chosenIcons: this.chosenIcons,
+      createdBy: this.createdBy,
       name: this.name,
     };
     return gameData;
@@ -336,6 +338,7 @@ class Game {
     this.extraTurn = gameData.extraTurn;
     this.sessionId = gameData.sessionId;
     this.chosenIcons = gameData.chosenIcons;
+    this.createdBy = gameData.createdBy;
     this.name = gameData.name;
   }
 }
