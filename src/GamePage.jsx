@@ -207,6 +207,7 @@ function GamePage({ game }) {
     setReadyForNextTurn(false); // Disable Next Turn button
     game.readyForNextTurn = false;
     let currentLocation = playerPositions[player.id].location;
+    const moveSpeedMatix = [0.9, 0.8, 0.6, 0.5, 0.4, 0.3];
 
     // GSAP timeline for the animation
     await new Promise(resolve => {
@@ -221,7 +222,7 @@ function GamePage({ game }) {
         const [xPos, yPos] = calculatePositionFromSlotLocation(newLocation);
 
         tl.to(player, {
-          duration: 0.2, // 200ms per slot
+          duration: moveSpeedMatix[moveBy], // adjusted to number of moves
           x: xPos,
           y: yPos,
           onUpdate: () => {
@@ -412,6 +413,7 @@ function GamePage({ game }) {
         <table>
           <thead>
             <tr>
+              <th></th>
               <th>Player</th>
               <th></th>
               <th>Score</th>
@@ -425,6 +427,13 @@ function GamePage({ game }) {
                   ? 'current-player'
                   : ''}
               >
+                <td>
+                  {(player.id === game.getCurrentPlayer().id) && (
+                    <span>
+                      &#10162;
+                    </span>
+                  )}
+                </td>
                 <td>{player.name}</td>
                 <td>
                   <img className='mini-icons' src={icons[player.icon]} />
@@ -475,15 +484,15 @@ function GamePage({ game }) {
               />
             </p>
             {extraTurn && <p>Extra Turn!</p>}
-            {diceResult && <p>Dice Roll: {diceResult}</p>}
+            {diceResult && <p>Dice Roll: {diceResult} &#127922;</p>}
             {readyForNextTurn && (
               <button className='game-btn-1' onClick={handleNextTurn}>
-                Next Turn
+                {extraTurn ? 'Another Turn' : 'Next Turn'}
               </button>
             )}
             {!readyForNextTurn && !diceResult && (
               <button className='game-btn-1' onClick={handlePlayerTurn}>
-                Roll Dice
+                &#127922; Roll Dice
               </button>
             )}
           </div>
